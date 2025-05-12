@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: RankCat
+
+# naver search ad key
+naver:
+  search:
+    ad:
+      access-license: ${ACCESS_LICENSE}   # ACCESS_LICENSE ????
+      secret-key:     ${SECRET_KEY}       # SECRET_KEY ????
+      customer-id:    ${CUSTOMER_ID}      # CUSTOMER_ID ????
+  shoppinginsight:
+    client:
+      id: ${CLIENT_ID}
+      secret: ${CLIENT_SECRET}
