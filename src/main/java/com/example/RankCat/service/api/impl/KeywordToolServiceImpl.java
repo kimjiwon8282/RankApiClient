@@ -1,5 +1,7 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.model.SearchAdKeywordResult;
+import com.example.RankCat.repository.SearchAdKeywordRepository;
 import com.example.RankCat.service.api.interfaces.KeywordToolService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
@@ -14,6 +16,7 @@ import java.util.Map;
 public class KeywordToolServiceImpl implements KeywordToolService {
 
     private final RestTemplate naverRestTemplate;
+    private final SearchAdKeywordRepository keywordRepository;
 
     @Override
     @SuppressWarnings("unchecked")//맵에서 꺼는 값을 제네릭 캐스팅 할때 발생하는 경고 무시
@@ -22,6 +25,17 @@ public class KeywordToolServiceImpl implements KeywordToolService {
         Map<String, Object> resp = naverRestTemplate //RestTemplate로 GET요청 전송
                 .exchange(path, HttpMethod.GET, null, Map.class, hint)//Map.class -> json전체를 Map<>으로 파싱함
                 .getBody();
-        return (List<Map<String, Object>>) resp.getOrDefault("keywordList", List.of());
+
+        List<Map<String, Object>> keywordList = (List<Map<String, Object>>)
+                resp.getOrDefault("keywordList", List.of());
+
+        SearchAdKeywordResult result = new SearchAdKeywordResult();
+        result.setKeyword(hint);  // keyword를 _id로 사용
+        result.setRelatedKeywords(keywordList);
+        result.setCallAt(System.currentTimeMillis());
+
+        keywordRepository.save(result); //keyword가 동일하면 자동 덮어 쓰기
+
+        return keywordList;
     }
 }
