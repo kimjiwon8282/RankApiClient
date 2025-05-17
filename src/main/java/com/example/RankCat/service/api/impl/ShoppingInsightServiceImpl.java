@@ -1,19 +1,23 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.model.ShoppingInsightCategoryResult;
+import com.example.RankCat.model.ShoppingInsightKeywordResult;
+import com.example.RankCat.repository.ShoppingInsightCategoryRepository;
+import com.example.RankCat.repository.ShoppingInsightKeywordRepository;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class ShoppingInsightServiceImpl implements ShoppingInsightService {
     private final RestTemplate shoppingInsightRestTemplate;
+    private final ShoppingInsightCategoryRepository categoryRepository;
+    private final ShoppingInsightKeywordRepository keywordRepository;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -33,11 +37,25 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
         body.put("ages", List.of());
 
         // POST 호출
-        return shoppingInsightRestTemplate.postForObject(
+        Map<String,Object> response = shoppingInsightRestTemplate.postForObject(
                 "/v1/datalab/shopping/categories", //URI 템플릿
                 new HttpEntity<>(body), //요청 엔티티(헤더+바디)
                 Map.class //응답 바디를 매핑할 타입
         );
+
+        // 저장
+        ShoppingInsightCategoryResult result = new ShoppingInsightCategoryResult();
+        result.setId(categoryCode);
+        result.setStartDate(startDate);
+        result.setEndDate(endDate);
+        result.setTimeUnit(timeUnit);
+        result.setCategoryName(categoryName);
+        result.setResponse(response);
+        result.setCallAt(System.currentTimeMillis());
+
+        categoryRepository.save(result);
+
+        return response;
     }
 
     @Override
@@ -60,10 +78,22 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
         body.put("gender",    "");
         body.put("ages",      List.of());
 
-        return shoppingInsightRestTemplate.postForObject(
+        Map<String,Object> response = shoppingInsightRestTemplate.postForObject(
                 "/v1/datalab/shopping/category/keywords",
                 new HttpEntity<>(body),
                 Map.class
         );
+        ShoppingInsightKeywordResult result = new ShoppingInsightKeywordResult();
+        List<String> sortedKs = new ArrayList<>(keywords);
+        Collections.sort(sortedKs);
+        String kwPart = String.join("_", sortedKs);
+        result.setId(categoryCode+"_"+kwPart);
+        result.setCategoryCode(categoryCode);
+        result.setKeywords(keywords);
+        result.setResponse(response);
+        result.setCallAt(System.currentTimeMillis());
+
+        keywordRepository.save(result);
+        return response;
     }
 }
