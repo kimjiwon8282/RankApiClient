@@ -11,13 +11,16 @@ import java.util.Map;
 @Getter @Setter
 public class ShoppingInsightCategoryResult {
     @Id
-    private String id;
+    private String id; //카테고리 코드
 
-    private String startDate;
-    private String endDate;
-    private String timeUnit;
     private String categoryName;
+    private Map<String, Object> monthlyResponse;
+    private long monthlyCallAt;
+    private String startDate_m;             // 요청 시작일
+    private String endDate_m;               // 요청 종료일
 
-    private Map<String,Object> response;
-    private long callAt;
+    private Map<String, Object> weeklyResponse;
+    private long weeklyCallAt;
+    private String startDate_w;             // 요청 시작일
+    private String endDate_w;               // 요청 종료일
 }

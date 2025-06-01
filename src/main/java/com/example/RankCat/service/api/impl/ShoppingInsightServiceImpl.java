@@ -6,6 +6,7 @@ import com.example.RankCat.repository.ShoppingInsightCategoryRepository;
 import com.example.RankCat.repository.ShoppingInsightKeywordRepository;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,6 +15,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ShoppingInsightServiceImpl implements ShoppingInsightService {
     private final RestTemplate shoppingInsightRestTemplate;
     private final ShoppingInsightCategoryRepository categoryRepository;
@@ -42,19 +44,31 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
                 new HttpEntity<>(body), //요청 엔티티(헤더+바디)
                 Map.class //응답 바디를 매핑할 타입
         );
+        log.info("categoryName={},쇼핑인사이트categoryapi 저장 완료",categoryName);
 
-        // 저장
-        ShoppingInsightCategoryResult result = new ShoppingInsightCategoryResult();
-        result.setId(categoryCode);
-        result.setStartDate(startDate);
-        result.setEndDate(endDate);
-        result.setTimeUnit(timeUnit);
-        result.setCategoryName(categoryName);
-        result.setResponse(response);
-        result.setCallAt(System.currentTimeMillis());
+        // 기존 데이터 조회 또는 신규 생성
+        ShoppingInsightCategoryResult result = categoryRepository.findById(categoryCode)
+                .orElseGet(()->{
+                   ShoppingInsightCategoryResult r = new ShoppingInsightCategoryResult();
+                   r.setId(categoryCode);
+                   r.setCategoryName(categoryName);
+                   return r;
+                });
+        long now = System.currentTimeMillis();
+        if ("month".equalsIgnoreCase(timeUnit)) {
+            result.setMonthlyResponse(response);
+            result.setMonthlyCallAt(now);
+            result.setStartDate_m(startDate);
+            result.setEndDate_m(endDate);
+        } else if ("week".equalsIgnoreCase(timeUnit)) {
+            result.setWeeklyResponse(response);
+            result.setWeeklyCallAt(now);
+            result.setStartDate_w(startDate);
+            result.setEndDate_w(endDate);
+        }
 
+        //저장
         categoryRepository.save(result);
-
         return response;
     }
 
