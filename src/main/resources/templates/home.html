@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>홈페이지</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div style="text-align:center; margin-top:100px;">
+  <!-- 인사 영역 -->
+  <h2 id="greeting">안녕하세요!</h2>
+
+  <!-- 랭킹 예측 안내 -->
+  <p>랭킹 예측 시스템을 이용해 보세요.</p>
+
+  <!-- 버튼이 들어갈 영역 (id 지정) -->
+  <div id="authBtnArea" style="margin-top:20px;"></div>
+</div>
+
+<!-- 공통 토큰 저장 스크립트 -->
+<script th:src="@{/js/token.js}"></script>
+<!-- 사용자 정보 조회 & 인사 스크립트 -->
+<script th:src="@{/js/home.js}"></script>
+</body>
+</html>
