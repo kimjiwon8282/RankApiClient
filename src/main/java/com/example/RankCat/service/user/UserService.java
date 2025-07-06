@@ -17,6 +17,7 @@ public class UserService { //회원가입 서비스
 
         return userRepository.save(User.builder()
                 .email(dto.getEmail())
+                .nickname(dto.getNickname())
                 .password(encoder.encode(dto.getPassword()))
                 .build()).getId();
     }
