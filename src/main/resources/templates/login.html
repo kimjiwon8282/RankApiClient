@@ -1,8 +1,8 @@
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>로그인</title>
-    <!-- 필요하다면 CSS 링크 추가 -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -13,6 +13,20 @@
     <a th:href="@{/oauth2/authorization/google}">
         <img th:src="@{/image/google.png}"
              alt="Google 로그인"
+             style="width:200px; cursor:pointer;"/>
+    </a>
+
+    <!-- 네이버 로그인 버튼 -->
+    <a th:href="@{/oauth2/authorization/naver}" style="display:block; margin-top:20px;">
+        <img th:src="@{/image/naver_login.png}"
+             alt="Naver 로그인"
+             style="width:200px; cursor:pointer;"/>
+    </a>
+
+    <!-- 카카오 로그인 버튼 -->
+    <a th:href="@{/oauth2/authorization/kakao}" style="display:block; margin-top:20px;">
+        <img th:src="@{/image/kakao_login.png}"
+             alt="Kakao 로그인"
              style="width:200px; cursor:pointer;"/>
     </a>
 

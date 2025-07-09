@@ -29,7 +29,7 @@ public class User implements UserDetails {  // Spring Security 인증용 인터�
     @Column(name = "password")
     private String password;                            // 암호화된 비밀번호
 
-    @Column(name = "nickname", unique = true)
+    @Column(name = "nickname")
     private String nickname;                            // 화면에 표시할 별명
 
     @Builder

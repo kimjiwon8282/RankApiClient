@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
@@ -53,10 +54,19 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                                         Authentication authentication) throws IOException {
         // 1) OAuth2User (소셜 유저 정보)를 추출
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+
+        // 👉 [여기부터 email 추출 방식을 변경]
+        String email;
+        if (oAuth2User.getAttributes().containsKey("response")) {
+            Map<String, Object> responseMap = (Map<String, Object>) oAuth2User.getAttributes().get("response");
+            email = (String) responseMap.get("email");
+        } else {
+            email = (String) oAuth2User.getAttributes().get("email");
+        }
+
         // 2) DB에서 실제 User 엔티티 조회 (이메일 기준)
-        User user = userService.findByEmail(
-                (String) oAuth2User.getAttributes().get("email")
-        );
+        User user = userService.findByEmail(email);
+
 
         // 3) Refresh Token 생성 → DB 저장 → 쿠키에 등록
         String refreshToken = tokenProvider.generateToken(user, REFRESH_TOKEN_DURATION);

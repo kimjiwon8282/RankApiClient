@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SignupController {
     private final UserService userService;
-
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody AddUserRequest addUserRequest) {
         try{
