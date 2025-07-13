@@ -105,8 +105,10 @@ public class WebOAuthSecurityConfig {
                                 "/login/oauth2/**",
                                 "/signup",
                                 "/user",
-                                "/home"
+                                "/home",
+                                "/api/user/**"
                         ).permitAll()
+
 
                         // – 토큰 재발급 엔드포인트 (공개)
                         .requestMatchers("/api/token").permitAll()

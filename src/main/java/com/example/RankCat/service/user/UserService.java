@@ -29,4 +29,8 @@ public class UserService { //회원가입 서비스
         return userRepository.findByEmail(email)
                 .orElseThrow(()->new IllegalArgumentException("Unexpected user"));
     }
+    // 이메일 존재 여부 반환
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 }

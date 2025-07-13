@@ -54,6 +54,12 @@ dependencies {
 	// @ConfigurationProperties 지원
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.apache.commons:commons-pool2'  // (커넥션풀용)
+	//email
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 }
 
 tasks.named('test') {

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+</head>
+<body>
+<div style="width:350px; margin:100px auto; text-align:center;">
+    <h2>회원가입</h2>
+    <form id="signupForm" autocomplete="off">
+        <div style="margin-bottom:10px;">
+            <input type="email" id="emailInput" name="email" placeholder="이메일" required style="width:200px;"/>
+            <button type="button" id="checkEmailBtn">이메일 중복 확인</button>
+        </div>
+        <!-- 이메일 인증 관련 UI -->
+        <div style="margin-bottom:10px;">
+            <button type="button" id="sendAuthCodeBtn">인증코드 받기</button>
+        </div>
+        <div style="margin-bottom:10px;">
+            <input type="text" id="authCodeInput" placeholder="인증코드 6자리" style="width:120px;"/>
+            <button type="button" id="verifyAuthCodeBtn">코드 확인</button>
+        </div>
+        <div id="emailCheckMsg" style="color:blue; margin-bottom:10px;"></div>
+        <div id="authCodeMsg" style="color:green; margin-bottom:10px;"></div>
+        <div style="margin-bottom:10px;">
+            <input type="text" id="nicknameInput" name="nickname" placeholder="닉네임" required style="width:200px;"/>
+        </div>
+        <div style="margin-bottom:10px;">
+            <input type="password" id="passwordInput" name="password" placeholder="비밀번호" required style="width:200px;"/>
+        </div>
+        <button type="submit" style="width:200px;">가입하기</button>
+    </form>
+    <p style="margin-top:20px;">
+        이미 계정이 있으신가요?
+        <a href="/login">로그인</a>
+    </p>
+</div>
+<script src="/js/signup.js"></script>
+</body>
+</html>
