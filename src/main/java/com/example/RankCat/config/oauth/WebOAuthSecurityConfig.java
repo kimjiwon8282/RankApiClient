@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -106,7 +108,8 @@ public class WebOAuthSecurityConfig {
                                 "/signup",
                                 "/user",
                                 "/home",
-                                "/api/user/**"
+                                "/api/user/**",
+                                "/api/login"
                         ).permitAll()
 
 
@@ -162,6 +165,15 @@ public class WebOAuthSecurityConfig {
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter(tokenProvider);
+    }
+
+    /**
+     * 스프링 시큐리티가 자동 구성한 AuthenticationManager를 Bean으로 등록합니다.
+     * 이 Bean을 주입받아 authManager.authenticate(...)로 사용자 인증 처리를 할 수 있습니다.
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
+        return cfg.getAuthenticationManager();
     }
 
     /**
