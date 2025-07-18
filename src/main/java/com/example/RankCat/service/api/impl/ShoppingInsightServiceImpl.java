@@ -118,7 +118,7 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
     @SuppressWarnings("unchecked")
     public Map<String, Object> getShopSearchTrend(String query) {
         // 네이버 OpenAPI 호출
-        String url = "/v1/search/shop?query={query}&display=5";
+        String url = "/v1/search/shop?query={query}&display=50";
         Map<String, Object> resp = shoppingInsightRestTemplate
                 .getForObject(url, Map.class, query);
 
