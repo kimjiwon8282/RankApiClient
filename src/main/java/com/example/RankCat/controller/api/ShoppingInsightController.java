@@ -14,11 +14,11 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/insight")
+@RequestMapping("/naver/api")
 public class ShoppingInsightController {
     private final ShoppingInsightService insightService;
 
-    @PostMapping("/categories")
+    @PostMapping("/insight/categories")
     public ResponseEntity<?> categories(
             @RequestBody Map<String,String> req){
         Map<String,Object> result = insightService.getCategoryTrend(
@@ -31,7 +31,7 @@ public class ShoppingInsightController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/keywords")
+    @PostMapping("/insight/keywords")
     public ResponseEntity<?> keywords(
             @RequestBody Map<String,Object> req){
         @SuppressWarnings("unchecked")
@@ -45,4 +45,16 @@ public class ShoppingInsightController {
         );
         return ResponseEntity.ok(result);
     }
+
+    // ✅ 네이버 쇼핑 검색(오픈API) 결과에서 items만 반환
+    @PostMapping("/trend")
+    public ResponseEntity<?> shopSearch(@RequestBody Map<String, String> req) {
+        String query = req.get("query");
+        // 서비스에서 네이버 응답 전체를 Map으로 반환
+        Map<String, Object> resp = insightService.getShopSearchTrend(query);
+        // items만 추출해서 반환 (node.js 예제처럼!)
+        Object items = resp.get("items");
+        return ResponseEntity.ok(items);
+    }
+
 }

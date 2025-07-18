@@ -1,7 +1,9 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.model.ShopSearchTrendResult;
 import com.example.RankCat.model.ShoppingInsightCategoryResult;
 import com.example.RankCat.model.ShoppingInsightKeywordResult;
+import com.example.RankCat.repository.ShopSearchTrendResultRepository;
 import com.example.RankCat.repository.ShoppingInsightCategoryRepository;
 import com.example.RankCat.repository.ShoppingInsightKeywordRepository;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
@@ -20,6 +22,7 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
     private final RestTemplate shoppingInsightRestTemplate;
     private final ShoppingInsightCategoryRepository categoryRepository;
     private final ShoppingInsightKeywordRepository keywordRepository;
+    private final ShopSearchTrendResultRepository trendRepository;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -109,5 +112,33 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
 
         keywordRepository.save(result);
         return response;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getShopSearchTrend(String query) {
+        // 네이버 OpenAPI 호출
+        String url = "/v1/search/shop?query={query}&display=5";
+        Map<String, Object> resp = shoppingInsightRestTemplate
+                .getForObject(url, Map.class, query);
+
+        // items에 rank 부여
+        List<Map<String, Object>> items = (List<Map<String, Object>>) resp.get("items");
+        if (items != null) {
+            for (int i = 0; i < items.size(); i++) {
+                items.get(i).put("rank", i + 1);
+            }
+        }
+
+        // MongoDB에 (query가 PK로) upsert (save) 방식 저장
+        ShopSearchTrendResult doc = new ShopSearchTrendResult();
+        doc.setId(query);
+        doc.setItems(items);
+        doc.setCallAt(System.currentTimeMillis());
+        trendRepository.save(doc);  // query가 PK니까 덮어씀
+
+        // 로그 및 반환
+        log.info("네이버 쇼핑 검색 저장 완료: query={}, items={}", query, items != null ? items.size() : 0);
+        return resp;
     }
 }

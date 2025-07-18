@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class KeywordToolController {
     private final KeywordToolService keywordToolService;
 
-    @PostMapping("/keyword")
+    @PostMapping("/naver/api/keyword")
     public ResponseEntity<?> keywordSearch(@RequestParam String keyword) {
         if (keyword == null || keyword.isBlank()) {
             return ResponseEntity.badRequest()

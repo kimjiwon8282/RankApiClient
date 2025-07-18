@@ -53,7 +53,10 @@ public class RestTemplateConfig {
         rt.getInterceptors().add((req, body, ex) -> {
             req.getHeaders().add("X-Naver-Client-Id",     insightProps.getId());
             req.getHeaders().add("X-Naver-Client-Secret", insightProps.getSecret());
-            req.getHeaders().add("Content-Type",          "application/json");
+            // Content-Type은 POST/PUT 등 바디 있는 요청에만 추가 (GET은 절대 추가하지 않음)
+            if(!req.getMethod().name().equals("GET")) {
+                req.getHeaders().add("Content-Type",          "application/json");
+            }
             return ex.execute(req, body);
         });
         return rt;

@@ -109,7 +109,8 @@ public class WebOAuthSecurityConfig {
                                 "/user",
                                 "/home",
                                 "/api/user/**",
-                                "/api/login"
+                                "/api/login",
+                                "/naver/api"
                         ).permitAll()
 
 
