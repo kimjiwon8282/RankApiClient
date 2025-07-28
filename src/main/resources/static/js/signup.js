@@ -1,14 +1,22 @@
+// 상태 플래그 변수 선언
+let emailCheckPassed = false;
+let emailAuthPassed = false;
+
 // --- 이메일 중복 확인 버튼 ---
 document.getElementById("checkEmailBtn").addEventListener("click", async function () {
     const email = document.getElementById("emailInput").value.trim();
     const msgBox = document.getElementById("emailCheckMsg");
     msgBox.style.color = "blue";
     msgBox.textContent = "";
+    emailCheckPassed = false;
+    emailAuthPassed = false;
+
     if (!email) {
         msgBox.style.color = "red";
         msgBox.textContent = "이메일을 입력하세요.";
         return;
     }
+
     try {
         const res = await fetch(`/api/user/email-exists?email=${encodeURIComponent(email)}`);
         const data = await res.json();
@@ -16,9 +24,12 @@ document.getElementById("checkEmailBtn").addEventListener("click", async functio
             msgBox.style.color = "red";
             msgBox.textContent = "이미 사용 중인 이메일입니다.";
             document.getElementById("emailInput").focus();
+            emailCheckPassed = false;
         } else {
             msgBox.style.color = "green";
             msgBox.textContent = "사용 가능한 이메일입니다!";
+            emailCheckPassed = true;
+            emailAuthPassed = false; // 인증은 새로 받아야 함
         }
     } catch (err) {
         msgBox.style.color = "red";
@@ -32,11 +43,13 @@ document.getElementById("sendAuthCodeBtn").addEventListener("click", async funct
     const msg = document.getElementById("authCodeMsg");
     msg.style.color = "green";
     msg.textContent = "";
-    if (!email) {
+
+    if (!emailCheckPassed) {
         msg.style.color = "red";
-        msg.textContent = "이메일을 먼저 입력하세요.";
+        msg.textContent = "먼저 이메일 중복 확인을 해주세요.";
         return;
     }
+
     try {
         const res = await fetch(`/api/user/send-auth-code`, {
             method: "POST",
@@ -64,11 +77,13 @@ document.getElementById("verifyAuthCodeBtn").addEventListener("click", async fun
     const msg = document.getElementById("authCodeMsg");
     msg.style.color = "green";
     msg.textContent = "";
+
     if (!email || !code) {
         msg.style.color = "red";
         msg.textContent = "이메일과 인증코드를 모두 입력하세요.";
         return;
     }
+
     try {
         const res = await fetch(`/api/user/verify-auth-code`, {
             method: "POST",
@@ -79,13 +94,16 @@ document.getElementById("verifyAuthCodeBtn").addEventListener("click", async fun
         if (res.ok) {
             msg.style.color = "green";
             msg.textContent = "이메일 인증 성공!";
+            emailAuthPassed = true;
         } else {
             msg.style.color = "red";
             msg.textContent = "실패: " + text;
+            emailAuthPassed = false;
         }
     } catch (err) {
         msg.style.color = "red";
         msg.textContent = "서버 오류. 다시 시도하세요.";
+        emailAuthPassed = false;
     }
 });
 
@@ -102,6 +120,18 @@ document.getElementById("signupForm").addEventListener("submit", async function 
     if (!email || !nickname || !password) {
         msgBox.style.color = "red";
         msgBox.textContent = "모든 항목을 입력하세요.";
+        return;
+    }
+
+    if (!emailCheckPassed) {
+        msgBox.style.color = "red";
+        msgBox.textContent = "이메일 중복 확인을 먼저 해주세요.";
+        return;
+    }
+
+    if (!emailAuthPassed) {
+        msgBox.style.color = "red";
+        msgBox.textContent = "이메일 인증을 완료해주세요.";
         return;
     }
 
