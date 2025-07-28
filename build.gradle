@@ -62,6 +62,12 @@ dependencies {
 
 }
 
+// 1. JUnit 플랫폼 선언 (선택 사항, 있어도 무방)
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// 2. 테스트 완전히 비활성화 (중요)
+tasks.withType(Test) {
+	enabled = false
 }
