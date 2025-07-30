@@ -1,0 +1,64 @@
+# 워크플로 전체 이름: GitHub Actions UI에 "CI/CD"로 표시됩니다.
+name: CI/CD
+
+# main 브랜치에 push 이벤트가 발생할 때마다 워크플로를 실행
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # GitHub가 관리하는 최신 우분투 래너를 사용합니다.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        # 리포지토리의 최신 코드를 워크플로 실행 환경으로 가져옵니다.
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'   # Amazon Corretto JDK 사용
+          java-version: '17'         # Java 17 설치
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x gradlew
+        # 프로젝트 루트의 gradlew 스크립트에 실행 권한을 부여합니다.
+
+      - name: Build project with Gradle
+        run: ./gradlew clean build
+        # - clean: 이전 빌드 결과 삭제
+        # - build: 컴파일, 테스트, 패키징까지 수행
+
+      - name: Get current time
+        id: current-time
+        uses: josStorer/get-current-time@v2.0.2
+        with:
+          format: 'YYYY-MM-DDTHH-mm-ss'  # 버전 레이블 등에 사용할 형식
+          utcOffset: '+09:00'            # 한국(서울) 시간대
+
+      - name: Set artifact filename
+        run: echo "artifact=$(ls ./build/libs/*.jar)" >> $GITHUB_ENV
+        # build/libs 경로에서 생성된 JAR 파일명을 찾아서
+        # GITHUB_ENV에 저장(다음 단계에서 사용)
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v20
+        # 커뮤니티 액션: einaregilsson/beanstalk-deploy
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          # AWS 액세스 키 ID (IAM에서 발급받은 Access Key ID)
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # AWS 시크릿 액세스 키 (IAM에서 발급받은 Secret Access Key)
+          application_name:   'rankit'
+          # Elastic Beanstalk에 생성해둔 애플리케이션 이름
+          environment_name:   'Rankit-env'
+          # 해당 애플리케이션 내 배포 대상 환경 이름
+          version_label:      github-action-${{ steps.current-time.outputs.formattedTime }}
+          # 버전 라벨: workflow 실행 시각 등을 조합해서 유니크하게 생성
+          region:             'ap-northeast-2'
+          # AWS 리전 코드 (서울)
+          deployment_package: './build/libs/${{ env.artifact }}'
+          # 빌드된 JAR/WAR 파일 경로 (위에서 GITHUB_ENV에 저장한 값)

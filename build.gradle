@@ -71,3 +71,7 @@ tasks.named('test') {
 tasks.withType(Test) {
 	enabled = false
 }
+
+jar{
+	enabled=false
+}
