@@ -40,7 +40,7 @@ jobs:
           utcOffset: '+09:00'            # 한국(서울) 시간대
 
       - name: Set artifact filename
-        run: echo "artifact=$(ls ./build/libs/*.jar)" >> $GITHUB_ENV
+        run: echo "artifact=$(ls ./build/libs/)" >> $GITHUB_ENV
         # build/libs 경로에서 생성된 JAR 파일명을 찾아서
         # GITHUB_ENV에 저장(다음 단계에서 사용)
 
