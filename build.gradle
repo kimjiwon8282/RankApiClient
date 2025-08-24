@@ -54,12 +54,18 @@ dependencies {
 	// @ConfigurationProperties 지원
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-	//Redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.apache.commons:commons-pool2'  // (커넥션풀용)
-	//email
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	// @Retryable 동작용 (AOP 프록시)
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
+	// 실패 재시도
+	implementation 'org.springframework.retry:spring-retry:2.0.7'
+
+	// ShedLock (스프링 연동 + Mongo 프로바이더)
+	implementation 'net.javacrumbs.shedlock:shedlock-spring:5.14.0'
+	implementation 'net.javacrumbs.shedlock:shedlock-provider-mongo:5.14.0'
+
+	//메일
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 // 1. JUnit 플랫폼 선언 (선택 사항, 있어도 무방)
