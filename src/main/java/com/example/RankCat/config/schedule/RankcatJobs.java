@@ -47,8 +47,8 @@ public class RankcatJobs {
         return (combined == null || combined.isBlank()) ? null : combined.trim();
     }
 
-    // 1) 관련 키워드 수집 — 매일 03:00 KST
-    @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
+    // 1) 관련 키워드 수집 — 매일 09:30 KST
+    @Scheduled(cron = "0 30 9 * * *", zone = "Asia/Seoul")
     @SchedulerLock(name = "rankcat.keyword.collect", lockAtMostFor = "PT30M", lockAtLeastFor = "PT1M")
     public void collectRelatedKeywordsDaily() throws IOException {
         log.info("[JOB] collectRelatedKeywordsDaily: start");
@@ -68,8 +68,8 @@ public class RankcatJobs {
         log.info("[JOB] collectRelatedKeywordsDaily: done");
     }
 
-    // 2) 쇼핑인사이트(월/주) 카테고리 트렌드 — 매일 03:10 KST
-    @Scheduled(cron = "0 10 3 * * *", zone = "Asia/Seoul")
+    // 2) 쇼핑인사이트(월/주) 카테고리 트렌드 — 매일 09:45 KST
+    @Scheduled(cron = "0 45 9 * * *", zone = "Asia/Seoul")
     @SchedulerLock(name = "rankcat.insight.category", lockAtMostFor = "PT45M", lockAtLeastFor = "PT2M")
     public void collectCategoryTrendDaily() throws IOException {
         log.info("[JOB] collectCategoryTrendDaily: start");
@@ -93,8 +93,8 @@ public class RankcatJobs {
         log.info("[JOB] collectCategoryTrendDaily: done");
     }
 
-    // 3) 네이버 쇼핑 검색 트렌드 — 매일 04:00 KST
-    @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
+    // 3) 네이버 쇼핑 검색 트렌드 — 매일 10:00 KST
+    @Scheduled(cron = "0 00 10 * * *", zone = "Asia/Seoul")
     @SchedulerLock(name = "rankcat.shop.search.trend", lockAtMostFor = "PT45M", lockAtLeastFor = "PT2M")
     public void collectShopSearchTrendDaily() throws IOException {
         log.info("[JOB] collectShopSearchTrendDaily: start");
