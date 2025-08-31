@@ -117,28 +117,76 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> getShopSearchTrend(String query) {
-        // 네이버 OpenAPI 호출
-        String url = "/v1/search/shop?query={query}&display=200";
-        Map<String, Object> resp = shoppingInsightRestTemplate
-                .getForObject(url, Map.class, query);
 
-        // items에 rank 부여
-        List<Map<String, Object>> items = (List<Map<String, Object>>) resp.get("items");
-        if (items != null) {
-            for (int i = 0; i < items.size(); i++) {
-                items.get(i).put("rank", i + 1);
-            }
+        // 1) 1페이지(1~100)
+        Map<String, Object> resp1 = fetchShopPage(query, 1, 100);
+        List<Map<String, Object>> items1 = (List<Map<String, Object>>) resp1.getOrDefault("items", List.of());
+        int total = ((Number) resp1.getOrDefault("total", items1.size())).intValue();
+
+        // 2) 2페이지(101~200) — total이 100 초과할 때만 호출(불필요 호출 방지)
+        List<Map<String, Object>> items2 = List.of();
+        if (total > 100) {
+            Map<String, Object> resp2 = fetchShopPage(query, 101, 100);
+            items2 = (List<Map<String, Object>>) resp2.getOrDefault("items", List.of());
         }
 
-        // MongoDB에 (query가 PK로) upsert (save) 방식 저장
+        // 3) 합치고 productId 중복 제거(LinkedHashMap으로 순서 유지)
+        Map<String, Map<String, Object>> uniq = new LinkedHashMap<>();
+        for (Map<String, Object> it : items1) {
+            String key = String.valueOf(it.get("productId")); // productId가 항상 온다고 가정
+            uniq.putIfAbsent(key, it);
+        }
+        for (Map<String, Object> it : items2) {
+            String key = String.valueOf(it.get("productId"));
+            uniq.putIfAbsent(key, it);
+        }
+        List<Map<String, Object>> merged = new ArrayList<>(uniq.values());
+
+        // 4) 200개 초과시 컷(안전)
+        if (merged.size() > 200) {
+            merged = merged.subList(0, 200);
+        }
+
+        // 5) 최종 rank 재부여(1..N)
+        for (int i = 0; i < merged.size(); i++) {
+            merged.get(i).put("rank", i + 1);
+        }
+
+        // 6) MongoDB 저장 (query를 PK로 덮어쓰기: 히스토리 보존하려면 PK를 query+timestamp로 바꾸세요)
         ShopSearchTrendResult doc = new ShopSearchTrendResult();
         doc.setId(query);
-        doc.setItems(items);
+        doc.setItems(merged);
         doc.setCallAt(System.currentTimeMillis());
-        trendRepository.save(doc);  // query가 PK니까 덮어씀
+        trendRepository.save(doc);
 
-        // 로그 및 반환
-        log.info("네이버 쇼핑 검색 저장 완료: query={}, items={}", query, items != null ? items.size() : 0);
+        log.info("네이버 쇼핑 검색 저장 완료: query={}, total={}, items(page1)={}, items(page2)={}, merged={}",
+                query, total, items1.size(), items2.size(), merged.size());
+
+        // 7) 반환: 2페이지까지 합친 결과를 응답 형태로 구성
+        Map<String, Object> out = new HashMap<>(resp1);
+        out.put("display", merged.size());
+        out.put("start", 1);
+        out.put("items", merged);
+        return out;
+    }
+
+    /**
+     * 페이지 호출 헬퍼: display<=100, start는 1-based
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> fetchShopPage(String query, int start, int display) {
+        String url = "/v1/search/shop?query={query}&display={display}&start={start}";
+        Map<String, Object> uriVars = new HashMap<>();
+        uriVars.put("query", query);
+        uriVars.put("display", Math.min(display, 100)); // 안전: 최대 100
+        uriVars.put("start", start);
+
+        Map<String, Object> resp = shoppingInsightRestTemplate.getForObject(url, Map.class, uriVars);
+        if (resp == null) {
+            resp = new HashMap<>();
+            resp.put("items", List.of());
+            resp.put("total", 0);
+        }
         return resp;
     }
 }
