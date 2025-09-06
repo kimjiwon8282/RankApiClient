@@ -61,4 +61,10 @@ public class RestTemplateConfig {
         });
         return rt;
     }
+
+    @Bean
+    public RestTemplate fastApiRestTemplate() {
+        // 내부 API 통신용이므로 특별한 헤더 설정 없이 가장 기본적인 형태로 생성합니다.
+        return new RestTemplate();
+    }
 }
