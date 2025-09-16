@@ -8,16 +8,21 @@ spring:
       thread-name-prefix: rankcat-scheduler-
   data:
     mongodb:
-      uri: TEST
+      uri: mongodb+srv://iwill324:Hodu1004!2@ranking.i0sxiey.mongodb.net/rankcat?retryWrites=true&w=majority
   #    #redis
   #    redis:
   #      host: localhost
   #      port: 6379
   datasource:
-    url: TEST
-    username: TEST
-    password: TEST
+    url: jdbc:mysql://awseb-e-jdkbpiwqsf-stack-awsebrdsdatabase-iiqmyaqvun40.cjs86o0k0wlo.ap-northeast-2.rds.amazonaws.com/rankit
+    username: rankit
+    password: rankit1004
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # 프론트 테스트용입니다!!!
+  # HTML/CSS/JS 수정 시 바로 반영 위한 코드
+  thymeleaf:
+    cache: false
 
   security:
     oauth2:
@@ -70,8 +75,8 @@ spring:
   mail:
     host: smtp.naver.com
     port: 465
-    username: TEST
-    password: TEST
+    username: iwill0324@naver.com
+    password: X2Z7BUC9XNE2
     properties:
       mail.smtp.auth: true
       mail.smtp.ssl.enable: true  # 반드시 추가!
@@ -82,9 +87,9 @@ spring:
 naver:
   search:
     ad:
-      access-license: TEST
-      secret-key:     TEST
-      customer-id:    TEST
+      access-license: 0100000000ce447e405e9af193d913660557afcafa1f43207a2d329d6208dc00dca6d2a8b9
+      secret-key:     AQAAAADORH5AXprxk9kTZgVXr8r6X3FFy+6EV6apXc2LmKg4VA==
+      customer-id:    3423256
 
   shoppinginsight:
     client:
@@ -93,4 +98,8 @@ naver:
 
 jwt:
   issuer: iwill324@pusan.ac.kr
-  secret-key: TEST
+  secret-key: study-springboot
+
+FASTAPI_URL: http://localhost:8000
+
+

@@ -1,0 +1,153 @@
+.login-new {
+    width: 100vw;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-new .login-body {
+    min-width: 720px;
+    /*width: 50%;*/
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-new .login-body .container {
+    width: 496px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/*.login-new .login-body .container>div:first-child {*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: flex-start;*/
+/*    flex-direction: column;*/
+/*    gap: 24px;*/
+/*    width: 100%*/
+/*}*/
+
+.login-new .login-body .container .join-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    width: 100%
+}
+
+.login-new .login-body .container .join-buttons>div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+}
+
+.social-login {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+}
+
+.social-login>a {
+    height: 56px;
+    width: 100%;
+    position: relative;
+}
+
+.social-login>a>i {
+    width: 100%;
+    height: 56px;
+}
+
+#btn-google .login-button {
+    background: #ffffff;
+    border: 1px solid rgba(9, 30, 66, 0.14);
+}
+
+#btn-naver .login-button {
+    background: #03C75A;
+}
+
+.login-button {
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    position: relative;
+    height: 56px;
+    padding: 0px 24px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 9999px;
+}
+
+.login-button-logo {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    left: 24px;
+    top: 18px;
+}
+
+.icon-google-login-logo {
+    background: url(../image/icon-login-logo-google.svg) no-repeat 50% 50%;
+    background-size: contain;
+    vertical-align: middle;
+}
+
+.icon-naver-login-logo {
+    background: url(../image/icon-login-logo-naver.svg) no-repeat 50% 50%;
+    background-size: contain;
+    vertical-align: middle;
+}
+
+.divider {
+    display: block;
+    margin: 30px auto 10px;
+    text-align: center;
+    height: 40px;
+    position: relative;
+    background: transparent;
+    color: #0f132a;
+    font-size: 13px;
+    width: 90%;
+    max-width: 680px;
+}
+
+.divider::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 0;
+    background: #0f132a;
+    height: 1px;
+    width: 45%;
+}
+
+.divider::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    right: 0;
+    background: #0f132a;
+    height: 1px;
+    width: 45%;
+}
+
+.divider span {
+    padding: 0 10px;
+    background-color: #FFF;
+    z-index: 2;
+    position: relative;
+}
