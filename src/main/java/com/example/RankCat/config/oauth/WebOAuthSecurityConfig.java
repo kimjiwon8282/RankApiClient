@@ -119,6 +119,8 @@ public class WebOAuthSecurityConfig {
 
                         // – API 호출은 JWT 인증 필수
                         .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/ai/save").authenticated() // 여기에 추가합니다.
+                        .requestMatchers("/ai/histories").authenticated() // 여기에 추가합니다.
 
                         // – 뷰 템플릿(게시글 목록·상세·작성)은 공개
                         .anyRequest().permitAll()

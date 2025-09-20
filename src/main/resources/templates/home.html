@@ -17,9 +17,47 @@
   <div id="authBtnArea" style="margin-top:20px;"></div>
 </div>
 
+<!-- ===== AI 예측 (입력 박스 방식) ===== -->
+<h3>AI 예측</h3>
+
+<form id="aiForm">
+  <div><label>query: <input id="query" type="text" value="가지"></label></div>
+  <div><label>title: <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg"></label></div>
+  <div><label>lprice: <input id="lprice" type="number" value="3000"></label></div>
+  <div><label>hprice: <input id="hprice" type="number" value="0"></label></div>
+  <div><label>mallName: <input id="mallName" type="text" value="-클릭마켓-"></label></div>
+  <div><label>brand: <input id="brand" type="text" value=""></label></div>
+  <div><label>maker: <input id="maker" type="text" value=""></label></div>
+  <div><label>productId: <input id="productId" type="text" value="82585481684"></label></div>
+  <div><label>productType: <input id="productType" type="text" value="2"></label></div>
+  <div><label>category1: <input id="category1" type="text" value="식품"></label></div>
+  <div><label>category2: <input id="category2" type="text" value="농산물"></label></div>
+  <div><label>category3: <input id="category3" type="text" value="채소"></label></div>
+  <div><label>category4: <input id="category4" type="text" value="가지"></label></div>
+</form>
+
+<div>
+  <button id="btnPredict" type="button">예측하기</button>
+  <span id="aiStatus"></span>
+</div>
+
+<!-- 결과 표시 박스 -->
+<div id="aiResultBox" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
+  <p><strong>예측 결과</strong></p>
+  <div style="display:none;">pred_rank: <span id="predRank"></span></div> <!-- 숨김 -->
+  <div>pred_rank_clipped: <span id="predRankClipped"></span></div> <!-- 사용자에게 보이는 값 -->
+  <div style="display:none;">query: <span id="respQuery"></span></div>
+  <div style="display:none;">title: <span id="respTitle"></span></div>
+  <div style="display:none;">exp_id: <span id="expId"></span></div>
+</div>
+<!-- ============================ -->
+
+
 <!-- 공통 토큰 저장 스크립트 -->
 <script th:src="@{/js/token.js}"></script>
 <!-- 사용자 정보 조회 & 인사 스크립트 -->
 <script th:src="@{/js/home.js}"></script>
+<!-- AI 예측 호출 스크립트(별도 파일에서 fetch 구현) -->
+<script th:src="@{/js/ai.js}"></script>
 </body>
 </html>
