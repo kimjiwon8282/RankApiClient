@@ -7,54 +7,30 @@
 </head>
 <body>
 <div style="text-align:center; margin-top:100px;">
+  <!-- 인사 영역 -->
   <h2 id="greeting">안녕하세요!</h2>
 
+  <!-- 랭킹 예측 안내 -->
   <p>랭킹 예측 시스템을 이용해 보세요.</p>
 
+  <!-- 로그인/로그아웃 버튼 영역 -->
   <div id="authBtnArea" style="margin-top:20px;"></div>
+</div>
+
+<div style="text-align: center; margin-top: 10px;">
+  <!-- 상품명 최적화하기 버튼 -->
+  <a href="/optimize-product-name">
+    <button type="button">상품명 최적화하기</button>
+  </a>
 </div>
 
 <div id="historyBtnArea" style="text-align: center; margin-top: 10px;"></div>
 
-<h3>AI 예측</h3>
-
-<form id="aiForm">
-  <div><label>query: <input id="query" type="text" value="가지"></label></div>
-  <div><label>title: <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg"></label></div>
-  <div><label>lprice: <input id="lprice" type="number" value="3000"></label></div>
-  <div><label>hprice: <input id="hprice" type="number" value="0"></label></div>
-  <div><label>mallName: <input id="mallName" type="text" value="-클릭마켓-"></label></div>
-  <div><label>brand: <input id="brand" type="text" value=""></label></div>
-  <div><label>maker: <input id="maker" type="text" value=""></label></div>
-  <div><label>productId: <input id="productId" type="text" value="82585481684"></label></div>
-  <div><label>productType: <input id="productType" type="text" value="2"></label></div>
-  <div><label>category1: <input id="category1" type="text" value="식품"></label></div>
-  <div><label>category2: <input id="category2" type="text" value="농산물"></label></div>
-  <div><label>category3: <input id="category3" type="text" value="채소"></label></div>
-  <div><label>category4: <input id="category4" type="text" value="가지"></label></div>
-</form>
-
-<div>
-  <button id="btnPredict" type="button">예측하기</button>
-  <span id="aiStatus"></span>
-</div>
-
-<div id="aiResultBox" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
-  <p><strong>예측 결과</strong></p>
-  <div style="display:none;">pred_rank: <span id="predRank"></span></div>
-  <div>pred_rank_clipped: <span id="predRankClipped"></span></div>
-  <div style="display:none;">query: <span id="respQuery"></span></div>
-  <div style="display:none;">title: <span id="respTitle"></span></div>
-  <div style="display:none;">exp_id: <span id="expId"></span></div>
-</div>
-
-<div style="margin-top: 10px;">
-  <button id="btnSave" type="button">히스토리 저장하기</button>
-  <span id="saveStatus"></span>
-</div>
+<!-- JS 파일 -->
 <script th:src="@{/js/token.js}"></script>
 <script type="module" th:src="@{/js/api.js}"></script>
 <script type="module" th:src="@{/js/home.js}"></script>
 <script type="module" th:src="@{/js/ai.js}"></script>
+
 </body>
 </html>

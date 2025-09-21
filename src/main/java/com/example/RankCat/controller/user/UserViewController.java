@@ -26,6 +26,11 @@ public class UserViewController {
         return "home";
     }
 
+    @GetMapping("/optimize-product-name")
+    public String optimizeProductName() {
+        return "optimize-product-name";
+    }
+
     @GetMapping("/my-history")
     public String history() {
         return "my-history";
