@@ -1,3 +1,5 @@
+import { httpRequest } from './api.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     const $ = (id) => document.getElementById(id);
 
@@ -22,27 +24,23 @@ document.addEventListener('DOMContentLoaded', () => {
         aiStatus.textContent = '요청 중…';
 
         const lastReq = {
-            query:       $('query').value,
-            title:       $('title').value,
-            lprice:      parseInt($('lprice').value) || 0,
-            hprice:      parseInt($('hprice').value) || 0,
-            mallName:    $('mallName').value,
-            brand:       $('brand').value,
-            maker:       $('maker').value,
-            productId:   $('productId').value,
-            productType: $('productType').value, // 문자열 유지
-            category1:   $('category1').value,
-            category2:   $('category2').value,
-            category3:   $('category3').value,
-            category4:   $('category4').value
+            query: $('query').value,
+            title: $('title').value,
+            lprice: parseInt($('lprice').value) || 0,
+            hprice: parseInt($('hprice').value) || 0,
+            mallName: $('mallName').value,
+            brand: $('brand').value,
+            maker: $('maker').value,
+            productId: $('productId').value,
+            productType: $('productType').value,
+            category1: $('category1').value,
+            category2: $('category2').value,
+            category3: $('category3').value,
+            category4: $('category4').value
         };
 
         try {
-            const res = await fetch('/ai/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items: [lastReq], clip_to_range: true })
-            });
+            const res = await httpRequest('POST', '/ai/predict', { items: [lastReq], clip_to_range: true });
             if (!res.ok) {
                 aiStatus.textContent = `실패 (${res.status})`;
                 state.lastReq = null;
@@ -73,6 +71,41 @@ document.addEventListener('DOMContentLoaded', () => {
             respTitle.textContent = '';
             expId.textContent = '';
             console.error(e);
+        }
+    });
+
+    // ------- 히스토리 저장 -------
+    btnSave?.addEventListener('click', async () => {
+        const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) {
+            window.location.href = '/login';
+            return;
+        }
+
+        if (!state.lastReq || !state.lastPred) {
+            saveStatus.textContent = '저장할 예측 결과가 없습니다.';
+            return;
+        }
+
+        saveStatus.textContent = '저장 중...';
+
+        const savePayload = {
+            ...state.lastReq,
+            predRank: state.lastPred.pred_rank,
+            predRankClipped: state.lastPred.pred_rank_clipped
+        };
+
+        try {
+            const res = await httpRequest('POST', '/ai/save', savePayload);
+
+            if (res.ok) {
+                saveStatus.textContent = '저장 성공!';
+            } else {
+                saveStatus.textContent = `저장 실패: ${res.statusText}`;
+            }
+        } catch (e) {
+            console.error(e);
+            saveStatus.textContent = '저장 중 오류가 발생했습니다.';
         }
     });
 });

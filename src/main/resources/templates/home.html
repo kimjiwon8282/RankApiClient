@@ -7,17 +7,15 @@
 </head>
 <body>
 <div style="text-align:center; margin-top:100px;">
-  <!-- 인사 영역 -->
   <h2 id="greeting">안녕하세요!</h2>
 
-  <!-- 랭킹 예측 안내 -->
   <p>랭킹 예측 시스템을 이용해 보세요.</p>
 
-  <!-- 버튼이 들어갈 영역 (id 지정) -->
   <div id="authBtnArea" style="margin-top:20px;"></div>
 </div>
 
-<!-- ===== AI 예측 (입력 박스 방식) ===== -->
+<div id="historyBtnArea" style="text-align: center; margin-top: 10px;"></div>
+
 <h3>AI 예측</h3>
 
 <form id="aiForm">
@@ -41,23 +39,22 @@
   <span id="aiStatus"></span>
 </div>
 
-<!-- 결과 표시 박스 -->
 <div id="aiResultBox" style="margin-top:20px; border:1px solid #ccc; padding:10px;">
   <p><strong>예측 결과</strong></p>
-  <div style="display:none;">pred_rank: <span id="predRank"></span></div> <!-- 숨김 -->
-  <div>pred_rank_clipped: <span id="predRankClipped"></span></div> <!-- 사용자에게 보이는 값 -->
+  <div style="display:none;">pred_rank: <span id="predRank"></span></div>
+  <div>pred_rank_clipped: <span id="predRankClipped"></span></div>
   <div style="display:none;">query: <span id="respQuery"></span></div>
   <div style="display:none;">title: <span id="respTitle"></span></div>
   <div style="display:none;">exp_id: <span id="expId"></span></div>
 </div>
-<!-- ============================ -->
 
-
-<!-- 공통 토큰 저장 스크립트 -->
+<div style="margin-top: 10px;">
+  <button id="btnSave" type="button">히스토리 저장하기</button>
+  <span id="saveStatus"></span>
+</div>
 <script th:src="@{/js/token.js}"></script>
-<!-- 사용자 정보 조회 & 인사 스크립트 -->
-<script th:src="@{/js/home.js}"></script>
-<!-- AI 예측 호출 스크립트(별도 파일에서 fetch 구현) -->
-<script th:src="@{/js/ai.js}"></script>
+<script type="module" th:src="@{/js/api.js}"></script>
+<script type="module" th:src="@{/js/home.js}"></script>
+<script type="module" th:src="@{/js/ai.js}"></script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 히스토리</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div style="text-align:center; margin-top:50px;">
+    <h2>내 히스토리</h2>
+    <p id="greeting">내역을 불러오는 중...</p>
+</div>
+
+<div style="margin: 20px;">
+    <p id="status"></p>
+
+    <ul id="historyList" style="list-style-type: none; padding: 0;"></ul>
+</div>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="/home"><button>홈으로 돌아가기</button></a>
+</div>
+
+<script th:src="@{/js/token.js}"></script>
+<script type="module" th:src="@{/js/api.js}"></script>
+<script type="module" th:src="@{/js/my-history.js}"></script>
+
+</body>
+</html>

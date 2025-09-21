@@ -26,6 +26,11 @@ public class UserViewController {
         return "home";
     }
 
+    @GetMapping("/my-history")
+    public String history() {
+        return "my-history";
+    }
+
     @GetMapping("/")
     public String index() {
         return "redirect:/home";
