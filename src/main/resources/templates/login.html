@@ -2,80 +2,72 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
     <title>로그인</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/typography.css}">
 </head>
 <body>
-<div style="text-align:center; margin-top:100px;">
-    <h1>로그인</h1>
-
     <div class="login-new">
         <div class="login-body">
             <div class="container">
+                <div class=""><h3>로그인/회원가입</h3></div>
                 <div class="join-buttons">
-                    <div>
                         <div class="social-login">
                             <!-- 구글 -->
-                            <a id="btn-google" th:href="@{/oauth2/authorization/google}">
-                                <div class="login-button">
-                                    <i class="login-button-logo icon-google-login-logo"></i>
-                                    <span>구글로 시작하기</span>
-                                </div>
+                            <a id="btn-google" class="login-button" th:href="@{/oauth2/authorization/google}">
+                                <i class="login-button-logo icon-google-login-logo"></i>
+                                <span>구글로 시작하기</span>
                             </a>
                             <!-- 네이버 -->
-                            <a id="btn-naver" th:href="@{/oauth2/authorization/naver}">
-                                <div class="login-button">
-                                    <i class="login-button-logo icon-naver-login-logo"></i>
-                                    <span>네이버로 시작하기</span>
-                                </div>
+                            <a id="btn-naver" class="login-button" th:href="@{/oauth2/authorization/naver}">
+                                <i class="login-button-logo icon-naver-login-logo"></i>
+                                <span>네이버로 시작하기</span>
                             </a>
                         </div>
 
                         <!-- 구분선 -->
                         <div class="divider">
-                            <span>or</span>
+                            <span>OR</span>
                         </div>
 
-                        <!-- 로컬 로그인 -->
-                        <form id="loginForm" class="sign-in-form">
-                            <input id="email" type="email" placeholder="이메일" required><br/>
-                            <input id="password" type="password" placeholder="비밀번호" required><br/>
-                            <span> <input type="checkbox"> <label>아이디 기억하기</label> </span>
-                            <a href="#">비밀번호를 잊으셨나요?</a><br/>
-                            <button type="submit">로그인하기</button>
-                        </form>
-                        <script>
-                            document.getElementById('loginForm').addEventListener('submit', async function(e) {
-                                e.preventDefault();
-                                const email = document.getElementById('email').value;
-                                const password = document.getElementById('password').value;
-                                const response = await fetch('/api/login', {
-                                    method: 'POST',
-                                    headers: {'Content-Type': 'application/json'},
-                                    body: JSON.stringify({email, password})
+                        <!-- 로컬(일반) 로그인 -->
+                        <div class="local-login">
+                            <form id="loginForm" class="sign-in-form">
+                                <input id="email" type="email" placeholder="이메일" required>
+                                <input id="password" type="password" placeholder="비밀번호" required>
+                                <div class="login-options">
+                                    <label><input type="checkbox">아이디 기억하기</label>
+                                    <a href="#">비밀번호를 잊으셨나요?</a>
+                                </div>
+                                <button type="submit">로그인하기</button>
+                            </form>
+                            <script>
+                                document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                                    e.preventDefault();
+                                    const email = document.getElementById('email').value;
+                                    const password = document.getElementById('password').value;
+                                    const response = await fetch('/api/login', {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({email, password})
+                                    });
+                                    if (response.ok) {
+                                        const { accessToken } = await response.json();
+                                        localStorage.setItem('access_token', accessToken);
+                                        alert('Login successful');
+                                        window.location.href = '/home';
+                                    } else {
+                                        alert('Login failed');
+                                    }
                                 });
-                                if (response.ok) {
-                                    const { accessToken } = await response.json();
-                                    localStorage.setItem('access_token', accessToken);
-                                    alert('Login successful');
-                                    window.location.href = '/home';
-                                } else {
-                                    alert('Login failed');
-                                }
-                            });
-                        </script>
-                    </div>
+                            </script>
+                        </div>
                 </div>
-
                 <!-- 회원가입 페이지로 이동 -->
-                <p style="margin-top:20px;">
-                    아직 회원이 아니신가요?
-                    <a th:href="@{/signup}">회원가입 하러 가기</a>
-                </p>
+                <div class="local-signup"><p>아직 회원이 아니신가요? <a th:href="@{/signup}">회원가입 하러 가기</a></p></div>
             </div>
         </div>
     </div>
-</div>
 </body>
 </html>
