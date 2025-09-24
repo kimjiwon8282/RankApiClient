@@ -11,10 +11,10 @@ public class UserViewController {
         return "login";
     }
 
-    @GetMapping("/app-login")
-    public String appLogin() {
-        return "app-login"; // Thymeleaf 템플릿 이름
-    }
+//    @GetMapping("/app-login")
+//    public String appLogin() {
+//        return "app-login"; // Thymeleaf 템플릿 이름
+//    }
 
     @GetMapping("/signup") //회원가입
     public String signup() {

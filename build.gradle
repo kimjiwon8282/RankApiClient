@@ -66,6 +66,9 @@ dependencies {
 
 	//메일
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//개발 시 잠깐 사용(타임리프 바로 반영 DevTools)
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 // 1. JUnit 플랫폼 선언 (선택 사항, 있어도 무방)

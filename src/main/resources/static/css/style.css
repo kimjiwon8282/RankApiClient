@@ -1,0 +1,25 @@
+html {
+    box-sizing: border-box;
+}
+
+html,body {
+    height: 100%;
+    scrollbar-face-color:rgba(0,0,0,0);
+    scrollbar-track-color:#efefef;
+    scrollbar-arrow-color:#cecece;
+    scrollbar-3dlight-color: none;
+    scrollbar-shadow-color:#cecece;
+    scrollbar-darkshadow-color: none;
+    scrollbar-color: #cecece rgba(0,0,0,0);
+    scrollbar-width: thin
+}
+
+body {
+    min-width: 320px !important;
+    overflow-y: scroll;
+    -webkit-font-smoothing: antialiased;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
