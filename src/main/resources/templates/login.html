@@ -4,38 +4,70 @@
     <meta charset="UTF-8">
     <title>로그인</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/typography.css}">
 </head>
 <body>
-<div style="text-align:center; margin-top:100px;">
-    <h1>로그인</h1>
+    <div class="login-new">
+        <div class="login-body">
+            <div class="container">
+                <div class=""><h3>로그인/회원가입</h3></div>
+                <div class="join-buttons">
+                        <div class="social-login">
+                            <!-- 구글 -->
+                            <a id="btn-google" class="login-button" th:href="@{/oauth2/authorization/google}">
+                                <i class="login-button-logo icon-google-login-logo"></i>
+                                <span>구글로 시작하기</span>
+                            </a>
+                            <!-- 네이버 -->
+                            <a id="btn-naver" class="login-button" th:href="@{/oauth2/authorization/naver}">
+                                <i class="login-button-logo icon-naver-login-logo"></i>
+                                <span>네이버로 시작하기</span>
+                            </a>
+                        </div>
 
-    <!-- 구글 로그인 버튼 -->
-    <a th:href="@{/oauth2/authorization/google}">
-        <img th:src="@{/image/google.png}"
-             alt="Google 로그인"
-             style="width:200px; cursor:pointer;"/>
-    </a>
+                        <!-- 구분선 -->
+                        <div class="divider">
+                            <span>OR</span>
+                        </div>
 
-    <!-- 네이버 로그인 버튼 -->
-    <a th:href="@{/oauth2/authorization/naver}" style="display:block; margin-top:20px;">
-        <img th:src="@{/image/naver_login.png}"
-             alt="Naver 로그인"
-             style="width:200px; cursor:pointer;"/>
-    </a>
-    <!-- 앱 로그인 버튼 추가 -->
-    <div style="margin-top:20px;">
-        <a th:href="@{/app-login}">
-            <button type="button" style="width:200px; height:50px; cursor:pointer;">
-                앱 로그인 하러 가기
-            </button>
-        </a>
+                        <!-- 로컬(일반) 로그인 -->
+                        <div class="local-login">
+                            <form id="loginForm" class="sign-in-form">
+                                <input id="email" type="email" placeholder="이메일" required>
+                                <input id="password" type="password" placeholder="비밀번호" required>
+                                <div class="login-options">
+                                    <label><input type="checkbox">아이디 기억하기</label>
+                                    <a href="#">비밀번호를 잊으셨나요?</a>
+                                </div>
+                                <button type="submit">로그인하기</button>
+                            </form>
+                            <script>
+                                document.getElementById('loginForm').addEventListener('submit', async function(e) {
+                                    e.preventDefault();
+                                    const email = document.getElementById('email').value;
+                                    const password = document.getElementById('password').value;
+                                    const response = await fetch('/api/login', {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({email, password})
+                                    });
+                                    if (response.ok) {
+                                        const { accessToken } = await response.json();
+                                        localStorage.setItem('access_token', accessToken);
+                                        alert('Login successful');
+                                        window.location.href = '/home';
+                                    } else {
+                                        alert('Login failed');
+                                    }
+                                });
+                            </script>
+                        </div>
+                </div>
+                <!-- 회원가입 페이지로 이동 -->
+                <div class="local-signup"><p>아직 회원이 아니신가요? <a th:href="@{/signup}">회원가입 하러 가기</a></p></div>
+            </div>
+        </div>
     </div>
-
-    <!-- 회원가입 페이지로 이동 -->
-    <p style="margin-top:20px;">
-        아직 회원이 아니신가요?
-        <a th:href="@{/signup}">회원가입 하러 가기</a>
-    </p>
-</div>
 </body>
 </html>
