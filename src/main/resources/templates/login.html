@@ -11,8 +11,9 @@
     <div class="login-new">
         <div class="login-body">
             <div class="container">
-                <div class=""><h3>로그인/회원가입</h3></div>
+                <div class=""><h2>로그인/회원가입</h2></div>
                 <div class="join-buttons">
+                        <!-- 소셜 로그인 -->
                         <div class="social-login">
                             <!-- 구글 -->
                             <a id="btn-google" class="login-button" th:href="@{/oauth2/authorization/google}">
@@ -42,26 +43,6 @@
                                 </div>
                                 <button type="submit">로그인하기</button>
                             </form>
-                            <script>
-                                document.getElementById('loginForm').addEventListener('submit', async function(e) {
-                                    e.preventDefault();
-                                    const email = document.getElementById('email').value;
-                                    const password = document.getElementById('password').value;
-                                    const response = await fetch('/api/login', {
-                                        method: 'POST',
-                                        headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({email, password})
-                                    });
-                                    if (response.ok) {
-                                        const { accessToken } = await response.json();
-                                        localStorage.setItem('access_token', accessToken);
-                                        alert('Login successful');
-                                        window.location.href = '/home';
-                                    } else {
-                                        alert('Login failed');
-                                    }
-                                });
-                            </script>
                         </div>
                 </div>
                 <!-- 회원가입 페이지로 이동 -->
@@ -69,5 +50,25 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({email, password})
+            });
+            if (response.ok) {
+                const { accessToken } = await response.json();
+                localStorage.setItem('access_token', accessToken);
+                alert('Login successful');
+                window.location.href = '/home';
+            } else {
+                alert('Login failed');
+            }
+        });
+    </script>
 </body>
 </html>
