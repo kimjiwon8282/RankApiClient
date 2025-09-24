@@ -15,11 +15,6 @@ spring:
     password: rankit1004
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  # 프론트 테스트용입니다!!!
-  # HTML/CSS/JS 수정 시 바로 반영 위한 코드
-  thymeleaf:
-    cache: false
-
   security:
     oauth2:
       client:
