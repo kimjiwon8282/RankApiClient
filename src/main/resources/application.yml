@@ -4,15 +4,15 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://iwill324:Hodu1004!2@ranking.i0sxiey.mongodb.net/rankcat?retryWrites=true&w=majority
+      uri: TEST
   #    #redis
   #    redis:
   #      host: localhost
   #      port: 6379
   datasource:
-    url: jdbc:mysql://awseb-e-jdkbpiwqsf-stack-awsebrdsdatabase-iiqmyaqvun40.cjs86o0k0wlo.ap-northeast-2.rds.amazonaws.com/rankit
-    username: rankit
-    password: rankit1004
+    url: TEST
+    username: TEST
+    password: TEST
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   security:
@@ -66,8 +66,8 @@ spring:
   mail:
     host: smtp.naver.com
     port: 465
-    username: iwill0324@naver.com
-    password: X2Z7BUC9XNE2
+    username: TEST
+    password: TEST
     properties:
       mail.smtp.auth: true
       mail.smtp.ssl.enable: true  # 반드시 추가!
@@ -78,9 +78,9 @@ spring:
 naver:
   search:
     ad:
-      access-license: 0100000000ce447e405e9af193d913660557afcafa1f43207a2d329d6208dc00dca6d2a8b9
-      secret-key:     AQAAAADORH5AXprxk9kTZgVXr8r6X3FFy+6EV6apXc2LmKg4VA==
-      customer-id:    3423256
+      access-license: TEST
+      secret-key:     TEST
+      customer-id:    TEST
 
   shoppinginsight:
     client:
@@ -89,8 +89,4 @@ naver:
 
 jwt:
   issuer: iwill324@pusan.ac.kr
-  secret-key: study-springboot
-
-FASTAPI_URL: http://localhost:8000
-
-
+  secret-key: TEST
