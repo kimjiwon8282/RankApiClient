@@ -1,7 +1,7 @@
 package com.example.RankCat.service.ai.impl;
 
-import com.example.RankCat.dto.SaveHistoryRequest;
-import com.example.RankCat.dto.UserHistoryResponse;
+import com.example.RankCat.dto.ai.SaveHistoryRequest;
+import com.example.RankCat.dto.ai.UserHistoryResponse;
 import com.example.RankCat.model.User;
 import com.example.RankCat.model.UserHistory;
 import com.example.RankCat.repository.UserHistoryRepository;

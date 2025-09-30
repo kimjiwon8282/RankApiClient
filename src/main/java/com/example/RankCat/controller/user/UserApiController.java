@@ -2,7 +2,7 @@ package com.example.RankCat.controller.user;
 
 
 import com.example.RankCat.config.jwt.TokenProvider;
-import com.example.RankCat.dto.UserInfoResponse;
+import com.example.RankCat.dto.user.UserInfoResponse;
 import com.example.RankCat.model.User;
 import com.example.RankCat.service.user.UserService;
 import lombok.RequiredArgsConstructor;

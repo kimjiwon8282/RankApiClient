@@ -1,5 +1,6 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.dto.api.KeywordRecommendResponse;
 import com.example.RankCat.model.SearchAdKeywordResult;
 import com.example.RankCat.repository.SearchAdKeywordRepository;
 import com.example.RankCat.service.api.interfaces.KeywordToolService;
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +43,27 @@ public class KeywordToolServiceImpl implements KeywordToolService {
         log.info("keyword={} 저장 완료 (관련키워드 수={})", hint, keywordList.size());
 
         return keywordList;
+    }
+
+    @Override
+    public KeywordRecommendResponse recommend(String hint, int limit) {
+        SearchAdKeywordResult doc = keywordRepository.findById(hint).orElse(null);
+        if (doc == null || doc.getRelatedKeywords() == null) {
+            log.warn("hint={} 에 대한 추천 키워드 없음", hint);
+            return KeywordRecommendResponse.builder()
+                    .hint(hint)
+                    .recommended(List.of())
+                    .build();
+        }
+
+        List<String> top = doc.getRelatedKeywords().stream()
+                .limit(limit)
+                .map(m -> String.valueOf(m.get("relKeyword")))
+                .collect(Collectors.toList());
+
+        return KeywordRecommendResponse.builder()
+                .hint(hint)
+                .recommended(top)
+                .build();
     }
 }

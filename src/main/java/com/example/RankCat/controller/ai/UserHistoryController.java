@@ -1,9 +1,8 @@
 package com.example.RankCat.controller.ai;
 
-import com.example.RankCat.dto.SaveHistoryRequest;
-import com.example.RankCat.dto.UserHistoryResponse;
+import com.example.RankCat.dto.ai.SaveHistoryRequest;
+import com.example.RankCat.dto.ai.UserHistoryResponse;
 import com.example.RankCat.model.User;
-import com.example.RankCat.model.UserHistory;
 import com.example.RankCat.repository.UserRepository;
 import com.example.RankCat.service.ai.interfaces.UserHistoryService;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.net.URI;
 
 @Controller
 @RequiredArgsConstructor

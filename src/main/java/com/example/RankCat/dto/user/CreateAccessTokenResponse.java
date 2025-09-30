@@ -1,4 +1,4 @@
-package com.example.RankCat.dto;
+package com.example.RankCat.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

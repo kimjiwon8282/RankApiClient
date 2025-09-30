@@ -1,6 +1,6 @@
 package com.example.RankCat.controller.user;
 
-import com.example.RankCat.dto.AddUserRequest;
+import com.example.RankCat.dto.user.AddUserRequest;
 import com.example.RankCat.service.user.EmailAuthService;
 import com.example.RankCat.service.user.UserService;
 import lombok.RequiredArgsConstructor;

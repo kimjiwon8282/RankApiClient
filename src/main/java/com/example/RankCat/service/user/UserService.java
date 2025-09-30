@@ -1,6 +1,6 @@
 package com.example.RankCat.service.user;
 
-import com.example.RankCat.dto.AddUserRequest;
+import com.example.RankCat.dto.user.AddUserRequest;
 import com.example.RankCat.model.User;
 import com.example.RankCat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

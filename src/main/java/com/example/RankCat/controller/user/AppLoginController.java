@@ -1,8 +1,8 @@
 package com.example.RankCat.controller.user;
 
 import com.example.RankCat.config.jwt.TokenProvider;
-import com.example.RankCat.dto.CreateAccessTokenResponse;
-import com.example.RankCat.dto.LoginRequest;
+import com.example.RankCat.dto.user.CreateAccessTokenResponse;
+import com.example.RankCat.dto.user.LoginRequest;
 import com.example.RankCat.model.RefreshToken;
 import com.example.RankCat.model.User;
 import com.example.RankCat.repository.RefreshTokenRepository;

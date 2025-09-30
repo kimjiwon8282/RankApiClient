@@ -1,7 +1,6 @@
 package com.example.RankCat.controller.ai;
 
-import com.example.RankCat.dto.HealthResponse;
-import com.example.RankCat.service.ai.impl.PredictionServiceImpl;
+import com.example.RankCat.dto.ai.HealthResponse;
 import com.example.RankCat.service.ai.interfaces.PredictionService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

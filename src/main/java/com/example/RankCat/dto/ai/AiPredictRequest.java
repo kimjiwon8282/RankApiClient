@@ -1,4 +1,4 @@
-package com.example.RankCat.dto;
+package com.example.RankCat.dto.ai;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

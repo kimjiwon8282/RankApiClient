@@ -1,4 +1,4 @@
-package com.example.RankCat.dto;
+package com.example.RankCat.dto.ai;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

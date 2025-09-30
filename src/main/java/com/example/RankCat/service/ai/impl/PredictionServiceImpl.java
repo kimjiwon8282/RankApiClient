@@ -1,8 +1,8 @@
 package com.example.RankCat.service.ai.impl;
 
-import com.example.RankCat.dto.AiPredictRequest;
-import com.example.RankCat.dto.AiPredictResponse;
-import com.example.RankCat.dto.HealthResponse;
+import com.example.RankCat.dto.ai.AiPredictRequest;
+import com.example.RankCat.dto.ai.AiPredictResponse;
+import com.example.RankCat.dto.ai.HealthResponse;
 import com.example.RankCat.service.ai.interfaces.PredictionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

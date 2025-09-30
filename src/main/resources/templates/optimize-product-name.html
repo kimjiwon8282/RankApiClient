@@ -25,6 +25,10 @@
                             <label>상품명</label>
                             <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg">
                         </div>
+                        <div class="keyword-recommend-container">
+                            <div id="keywordRecommendList" class="keyword-list-inline">
+                            </div>
+                        </div>
                         <div>
                             <label>최저가격</label>
                             <input id="lprice" type="number" value="3000">
@@ -113,6 +117,6 @@
 <script type="module" th:src="@{/js/api.js}"></script>
 <script type="module" th:src="@{/js/category.js}"></script>
 <script type="module" th:src="@{/js/ai.js}"></script>
-
+<script type="module" th:src="@{/js/keyword-recommend.js}"></script>
 </body>
 </html>
