@@ -9,7 +9,7 @@ build/
 .env
 
 # 런타임 산출물
-data/
+/data/
 
 # 로그 파일
 *.log
@@ -57,3 +57,4 @@ out/
 *.tmp
 *.bak
 *.swp
+
