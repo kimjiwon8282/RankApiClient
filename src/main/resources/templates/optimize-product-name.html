@@ -55,19 +55,19 @@
                         </div>
                         <div>
                             <label>카테고리1</label>
-                            <input id="category1" type="text" value="식품">
+                            <select id="category1"></select>
                         </div>
                         <div>
                             <label>카테고리2</label>
-                            <input id="category2" type="text" value="농산물">
+                            <select id="category2"></select>
                         </div>
                         <div>
                             <label>카테고리3</label>
-                            <input id="category3" type="text" value="채소">
-                            </div>
+                            <select id="category3"></select>
+                        </div>
                         <div>
                             <label>카테고리4</label>
-                            <input id="category4" type="text" value="가지">
+                            <select id="category4"></select>
                         </div>
                     </form>
                     <div>
@@ -111,6 +111,7 @@
 <!-- JS 파일 -->
 <script th:src="@{/js/token.js}"></script>
 <script type="module" th:src="@{/js/api.js}"></script>
+<script type="module" th:src="@{/js/category.js}"></script>
 <script type="module" th:src="@{/js/ai.js}"></script>
 
 </body>
