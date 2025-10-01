@@ -21,6 +21,9 @@
                             <label>검색키워드</label>
                             <input id="query" type="text" value="가지">
                         </div>
+                        <div class="query-analysis-container">
+                            <pre id="queryAnalysisResult"></pre>
+                        </div>
                         <div>
                             <label>상품명</label>
                             <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg">
@@ -118,5 +121,6 @@
 <script type="module" th:src="@{/js/category.js}"></script>
 <script type="module" th:src="@{/js/ai.js}"></script>
 <script type="module" th:src="@{/js/keyword-recommend.js}"></script>
+<script type="module" th:src="@{/js/query-analysis.js}"></script>
 </body>
 </html>

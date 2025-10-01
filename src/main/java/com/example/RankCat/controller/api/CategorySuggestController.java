@@ -1,6 +1,6 @@
-package com.example.RankCat.controller.user;
+package com.example.RankCat.controller.api;
 
-import com.example.RankCat.dto.category.CategorySuggestResponse;
+import com.example.RankCat.dto.api.CategorySuggestResponse;
 import com.example.RankCat.service.api.interfaces.CategorySuggestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

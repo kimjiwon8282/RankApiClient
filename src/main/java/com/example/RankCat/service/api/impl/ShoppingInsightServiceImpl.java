@@ -1,5 +1,6 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.dto.api.InsightResponseDto;
 import com.example.RankCat.model.ShopSearchTrendResult;
 import com.example.RankCat.model.ShoppingInsightCategoryResult;
 import com.example.RankCat.model.ShoppingInsightKeywordResult;
@@ -188,5 +189,19 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
             resp.put("total", 0);
         }
         return resp;
+    }
+
+    @Override
+    public InsightResponseDto getInsightByQuery(String query) {
+        // 1. 쿼리(검색어)를 categoryName으로 간주하고 DB에서 직접 조회합니다.
+        Optional<ShoppingInsightCategoryResult> insightOpt = categoryRepository.findByCategoryName(query);
+
+        if (insightOpt.isEmpty()) {
+            log.warn("카테고리명 '{}'에 대한 쇼핑 인사이트 데이터가 없습니다.", query);
+            return null;
+        }
+
+        // 2. 조회된 데이터를 DTO로 변환하여 반환합니다.
+        return InsightResponseDto.fromEntity(insightOpt.get());
     }
 }

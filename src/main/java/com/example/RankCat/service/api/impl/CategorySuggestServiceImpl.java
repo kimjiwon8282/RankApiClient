@@ -1,7 +1,7 @@
 package com.example.RankCat.service.api.impl;
 
-import com.example.RankCat.dto.category.CategoryPath;
-import com.example.RankCat.dto.category.CategorySuggestResponse;
+import com.example.RankCat.dto.api.CategoryPath;
+import com.example.RankCat.dto.api.CategorySuggestResponse;
 import com.example.RankCat.model.ShopSearchTrendResult;
 import com.example.RankCat.repository.ShopSearchTrendResultRepository;
 import com.example.RankCat.service.api.interfaces.CategorySuggestService;

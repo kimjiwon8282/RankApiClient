@@ -1,4 +1,4 @@
-package com.example.RankCat.dto.category;
+package com.example.RankCat.dto.api;
 
 import lombok.*;
 

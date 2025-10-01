@@ -1,13 +1,11 @@
 package com.example.RankCat.controller.api;
 
+import com.example.RankCat.dto.api.InsightResponseDto;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +53,23 @@ public class ShoppingInsightController {
         // items만 추출해서 반환 (node.js 예제처럼!)
         Object items = resp.get("items");
         return ResponseEntity.ok(items);
+    }
+
+    @GetMapping("/category-trend")
+    public ResponseEntity<?> getCategoryTrend(@RequestParam String query) {
+        if (query == null || query.isBlank()) {
+            return ResponseEntity.badRequest().body("쿼리를 입력해주세요.");
+        }
+
+        InsightResponseDto result = insightService.getInsightByQuery(query);
+
+        if (result == null) {
+            // 조회된 데이터가 없을 경우 404 Not Found 응답
+            return ResponseEntity.notFound().build();
+        }
+
+        // 데이터가 있으면 200 OK 응답과 함께 데이터 전송
+        return ResponseEntity.ok(result);
     }
 
 }

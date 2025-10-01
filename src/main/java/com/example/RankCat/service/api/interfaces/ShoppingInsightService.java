@@ -1,5 +1,7 @@
 package com.example.RankCat.service.api.interfaces;
 
+import com.example.RankCat.dto.api.InsightResponseDto;
+
 import java.util.List;
 import java.util.Map;
 
@@ -16,4 +18,6 @@ public interface ShoppingInsightService {
 
     //검색 api 내 쇼핑
     Map<String, Object> getShopSearchTrend(String query);
+
+    InsightResponseDto getInsightByQuery(String query);
 }
