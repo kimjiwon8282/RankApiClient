@@ -26,6 +26,11 @@ public class UserViewController {
         return "home";
     }
 
+    @GetMapping("/keyword-analysis")
+    public String keywordAnalysisPage() {
+        return "keyword-analysis";
+    }
+
     @GetMapping("/optimize-product-name")
     public String optimizeProductName() {
         return "optimize-product-name";

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>키워드 분석</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/optimize.css}">
+</head>
+<body>
+<div class="optimize-new">
+    <div class="optimize-body">
+        <div class="container">
+            <h2>키워드 분석</h2>
+            <p>분석하고 싶은 키워드를 입력하면, 저장된 연관 키워드 데이터를 보여줍니다.</p>
+
+            <div class="ai-input" style="margin-top: 20px;">
+                <div>
+                    <label for="query">분석 키워드</label>
+                    <input id="query" type="text" placeholder="예: 가지" style="width: 300px;">
+                </div>
+            </div>
+
+            <div class="analysis-result" style="margin-top: 20px;">
+                <h3>분석 결과 <span id="analysisStatus" style="font-size: 0.8em; color: #555;"></span></h3>
+                <pre id="analysisResult" style="background-color: #f4f4f4; border: 1px solid #ddd; padding: 15px; border-radius: 5px; min-height: 200px; white-space: pre-wrap; word-wrap: break-word;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" th:src="@{/js/api.js}"></script>
+<script type="module" th:src="@{/js/keyword-analysis.js}"></script>
+
+</body>
+</html>
+</html>

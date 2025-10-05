@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,5 +66,12 @@ public class KeywordToolServiceImpl implements KeywordToolService {
                 .hint(hint)
                 .recommended(top)
                 .build();
+    }
+
+    @Override
+    public Optional<SearchAdKeywordResult> getKeywordAnalysis(String query) {
+        log.info("DB에서 키워드 분석 데이터 조회: query={}", query);
+        // Repository의 findById를 사용해 DB에서 데이터를 찾아 Optional로 반환합니다.
+        return keywordRepository.findById(query);
     }
 }
