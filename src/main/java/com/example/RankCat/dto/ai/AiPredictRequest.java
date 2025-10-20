@@ -32,8 +32,6 @@ public class AiPredictRequest {
         private String mallName;
         private String brand;
         private String maker;
-        private String productId;
-        private String productType;
         private String category1;
         private String category2;
         private String category3;

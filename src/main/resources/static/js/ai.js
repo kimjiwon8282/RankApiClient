@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPredict?.addEventListener('click', async () => {
         aiStatus.textContent = '요청 중…';
 
+        // productId, productType 제거!
         const lastReq = {
             query: $('query').value,
             title: $('title').value,
@@ -31,8 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mallName: $('mallName').value,
             brand: $('brand').value,
             maker: $('maker').value,
-            productId: $('productId').value,
-            productType: $('productType').value,
             category1: $('category1').value,
             category2: $('category2').value,
             category3: $('category3').value,
@@ -51,11 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             aiStatus.textContent = '성공';
 
+            // FastAPI 응답 필드명 스네이크케이스(예: pred_rank)
             const r = (data.results && data.results[0]) || null;
             state.lastReq = lastReq;
             state.lastPred = r;
 
-            // 화면 반영
+            // 화면 반영 (스네이크케이스로 접근!)
             predRank.textContent = r?.pred_rank ?? '';
             predRankClipped.textContent = r?.pred_rank_clipped ?? '';
             respQuery.textContent = r?.query ?? '';
@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const savePayload = {
             ...state.lastReq,
+            // 저장시에도 최신 필드명과 맞추기!
             predRank: state.lastPred.pred_rank,
             predRankClipped: state.lastPred.pred_rank_clipped
         };

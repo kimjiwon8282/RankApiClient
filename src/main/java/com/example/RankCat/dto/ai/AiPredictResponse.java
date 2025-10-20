@@ -14,8 +14,10 @@ import java.util.List;
 @Builder
 public class AiPredictResponse {
 
+    @JsonProperty("results")
     private List<Result> results;
 
+    @JsonProperty("n")
     private Integer n;
 
     @Getter
@@ -29,7 +31,10 @@ public class AiPredictResponse {
         @JsonProperty("pred_rank_clipped")
         private Double predRankClipped;
 
+        @JsonProperty("query")
         private String query;
+
+        @JsonProperty("title")
         private String title;
 
         @JsonProperty("exp_id")
