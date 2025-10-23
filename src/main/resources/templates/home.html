@@ -1,33 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>홈페이지</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <title>홈페이지</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/typography.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
 </head>
 <body>
-<div style="text-align:center; margin-top:100px;">
-  <!-- 인사 영역 -->
-  <h2 id="greeting">안녕하세요!</h2>
-
-  <!-- 랭킹 예측 안내 -->
-  <p>랭킹 예측 시스템을 이용해 보세요.</p>
-
-  <!-- 로그인/로그아웃 버튼 영역 -->
-  <div id="authBtnArea" style="margin-top:20px;"></div>
-</div>
-
-<div style="text-align: center; margin-top: 10px;">
-  <!-- 상품명 최적화하기 버튼 -->
-  <a href="/optimize-product-name">
-    <button type="button">상품명 최적화하기</button>
-  </a>
-</div>
-<div style="text-align: center; margin-top: 10px;">
-  <a href="/keyword-analysis">
-    <button type="button">키워드 분석하기</button>
-  </a>
-</div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+<section class="home-actions">
+    <a class="action-card" href="/optimize-product-name">
+        <h3>상품 분석</h3> <!-- = 상품명 최적화 -->
+        <span class="action-icon action-icon-product" aria-hidden="true"></span>
+    </a>
+    <a class="action-card" href="/keyword-analysis">
+        <h3>키워드 분석</h3>
+        <span class="action-icon action-icon-keyword" aria-hidden="true"></span>
+    </a>
+</section>
 
 <div id="historyBtnArea" style="text-align: center; margin-top: 10px;"></div>
 
