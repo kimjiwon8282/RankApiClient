@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <title>내 히스토리</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/typography.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <div style="text-align:center; margin-top:50px;">
     <h2>내 히스토리</h2>
