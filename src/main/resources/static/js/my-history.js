@@ -3,8 +3,9 @@ import { httpRequest } from './api.js';
 document.addEventListener('DOMContentLoaded', async () => {
     const $ = (id) => document.getElementById(id);
 
-    const statusEl = $('status');
-    const greetingEl = $('greeting');
+    const statusEl    = $('status');
+    const greetingEl  = $('greeting');
+    // 기존 변수명 유지: historyListEl → 이제 테이블의 <tbody id="historyList">
     const historyListEl = $('historyList');
 
     statusEl.textContent = '히스토리를 불러오는 중...';
@@ -13,37 +14,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res = await httpRequest('GET', '/ai/histories');
 
         if (!res.ok) {
-            // 토큰 재발급 후에도 실패했다면 로그인 페이지로 리다이렉트
+            // 토큰 재발급 후에도 실패했다면 로그인 페이지로 이동
             window.location.href = '/login';
             return;
         }
 
         const data = await res.json();
-        const nickname = data.nickname;
+        const nickname  = data.nickname;
         const histories = data.histories || [];
 
         greetingEl.textContent = `${nickname}님의 히스토리 목록입니다.`;
         statusEl.textContent = '';
 
-        // 히스토리 목록을 화면에 렌더링
-        historyListEl.innerHTML = ''; // 기존 목록 초기화
-        if (histories.length > 0) {
-            histories.forEach(item => {
-                const listItem = document.createElement('li');
-                listItem.style.border = '1px solid #ccc';
-                listItem.style.padding = '10px';
-                listItem.style.marginBottom = '10px';
-                listItem.innerHTML = `
-                    <strong>쿼리:</strong> ${item.query || '없음'}<br>
-                    <strong>제목:</strong> ${item.title || '없음'}<br>
-                    <strong>예측 랭킹:</strong> ${item.predRankClipped || '없음'}<br>
-                    <strong>저장일:</strong> ${item.createdAt ? new Date(item.createdAt).toLocaleString() : '없음'}<br>
-                `;
-                historyListEl.appendChild(listItem);
-            });
-        } else {
-            historyListEl.innerHTML = '<li>아직 저장된 히스토리가 없습니다.</li>';
+        // 표 본문 초기화
+        historyListEl.innerHTML = '';
+
+        if (histories.length === 0) {
+            historyListEl.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align:center; color:#6b7280; padding:24px;">
+            아직 저장된 히스토리가 없습니다.
+          </td>
+        </tr>`;
+            return;
         }
+
+        // 데이터 렌더링
+        const rows = histories.map(toRowHtml).join('');
+        historyListEl.innerHTML = rows;
 
     } catch (e) {
         console.error('Failed to load history:', e);
@@ -51,3 +49,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/login';
     }
 });
+
+/* ---------- helpers ---------- */
+
+function toRowHtml(item){
+    const query   = escapeHtml(item.query || '없음');
+    const title   = escapeHtml(item.title || '제목 없음');
+    const rankNum = item.predRankClipped != null ? Math.round(Number(item.predRankClipped)) : null;
+    const rankCls = rankNum != null && rankNum <= 10 ? 'rank-badge top10' : 'rank-badge';
+    const dateTxt = formatDate(item.createdAt);
+
+    return `
+    <tr>
+      <td class="ellipsis" title="${query}">${query}</td>
+      <td class="ellipsis" title="${title}">${title}</td>
+      <td><span class="${rankCls}">${rankNum ?? '-'}</span></td>
+      <td>${dateTxt}</td>
+    </tr>
+  `;
+}
+
+function escapeHtml(str){
+    return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#39;");
+}
+function formatDate(iso){
+    if (!iso) return '-';
+    try{
+        const d = new Date(iso);
+        return d.toLocaleString();
+    }catch(_){ return '-';}
+}
