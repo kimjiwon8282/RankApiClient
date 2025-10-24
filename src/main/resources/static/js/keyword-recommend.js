@@ -38,12 +38,36 @@ document.addEventListener('DOMContentLoaded', () => {
             recommendListEl.innerHTML = ''; // 이전 결과를 지웁니다.
 
             if (keywords.length > 0) {
-                keywords.forEach(keyword => {
-                    // 클릭 기능이 없으므로 단순한 div 태그로 텍스트만 표시합니다.
-                    const item = document.createElement('div');
-                    item.className = 'keyword-item'; // CSS 스타일링을 위한 클래스
-                    item.textContent = keyword;
-                    recommendListEl.appendChild(item);
+                const keywordContainer = document.getElementById('keywordRecommendList');
+                keywordContainer.innerHTML = '';
+
+                // 클릭 시 상품명에 추가하는 기능 ON/OFF
+                const CLICK_TO_APPEND = true; // true 로 바꾸면 칩 클릭 시 #title 에 키워드가 추가됩니다.
+
+                keywords.forEach((keyword) => {
+                    // 기본: 클릭되지 않는 칩(span)
+                    const chip = document.createElement('span');
+                    chip.className = 'keyword-chip';
+                    chip.textContent = keyword;
+
+                    if (CLICK_TO_APPEND) {
+                        chip.tabIndex = 0;           // 접근성
+                        chip.role = 'button';
+                        chip.classList.add('is-clickable');
+                        chip.addEventListener('click', () => {
+                            const titleInput = document.getElementById('title');
+                            if (!titleInput) return;
+
+                            const current = (titleInput.value || '').trim();
+                            // 이미 포함되어 있으면 중복으로 붙이지 않음
+                            const exists = new RegExp(`(^|\\s)${keyword}(\\s|$)`).test(current);
+                            const next = exists ? current : (current ? `${current} ${keyword}` : keyword);
+                            titleInput.value = next;
+                            titleInput.dispatchEvent(new Event('input'));
+                        });
+                    }
+
+                    keywordContainer.appendChild(chip);
                 });
             }
 
