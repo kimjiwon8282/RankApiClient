@@ -4,31 +4,36 @@ spring:
 
   data:
     mongodb:
-      uri: TEST
-  #    #redis
-  #    redis:
-  #      host: localhost
-  #      port: 6379
+      uri: ${MONGO_URI}
+#    #redis
+#    redis:
+#      host: localhost
+#      port: 6379
   datasource:
-    url: TEST
-    username: TEST
-    password: TEST
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # 프론트 테스트용입니다!!!
+  # HTML/CSS/JS 수정 시 바로 반영 위한 코드
+  thymeleaf:
+    cache: false
 
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: 1058802701975-u0d4hrvhgc9lfqa7bs555n02pcqr0g8q.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             scope:
               - email
               - profile
           naver:
-            client-id: 3AIdpZzADRyEQT9Rdxrb
-            client-secret: fmRpK5rnLo
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
             redirect-uri: "{baseUrl}/login/oauth2/code/naver"
             authorization-grant-type: authorization_code
             client-name: Naver
@@ -36,7 +41,7 @@ spring:
               - email
               - nickname
           kakao:
-            client-id: 76cbc01f33b78a19c3f864bceca8c380
+            client-id: ${KAKAO_CLIENT_ID}
             # client-secret: [카카오 시크릿 키]   # 필요시 추가
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
@@ -66,27 +71,28 @@ spring:
   mail:
     host: smtp.naver.com
     port: 465
-    username: TEST
-    password: TEST
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail.smtp.auth: true
       mail.smtp.ssl.enable: true  # 반드시 추가!
       mail.smtp.ssl.trust: smtp.naver.com
     default-encoding: UTF-8
 
-# naver search ad key
-naver:
-  search:
-    ad:
-      access-license: TEST
-      secret-key:     TEST
-      customer-id:    TEST
+  naver:
+    search:
+      ad:
+        access-license: ${NAVER_SEARCH_AD_ACCESS_LICENSE}
+        secret-key: ${NAVER_SEARCH_AD_SECRET_KEY}
+        customer-id: ${NAVER_SEARCH_AD_CUSTOMER_ID}
 
-  shoppinginsight:
-    client:
-      id: hsrlivRHUW8r4n_eB7xw
-      secret: lc0M_cVOmM
+    shoppinginsight:
+      client:
+        id: ${NAVER_SHOPPING_INSIGHT_CLIENT_ID}
+        secret: ${NAVER_SHOPPING_INSIGHT_CLIENT_SECRET}
 
-jwt:
-  issuer: iwill324@pusan.ac.kr
-  secret-key: TEST
+  jwt:
+    issuer: ${JWT_ISSUER}
+    secret-key: ${JWT_SECRET_KEY}
+
+  FASTAPI_URL: ${FASTAPI_URL}

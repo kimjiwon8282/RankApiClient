@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>상품명 최적화</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/optimize.css}">
     <link rel="stylesheet" th:href="@{/css/typography.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/optimize.css}">
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="optimize-new">
     <div class="optimize-body">
         <div class="container">
@@ -22,15 +24,25 @@
                             <input id="query" type="text" value="가지">
                         </div>
                         <div class="query-analysis-container">
-                            <pre id="queryAnalysisResult"></pre>
+                            <pre id="queryAnalysisResult" class="qa-debug" aria-hidden="true"></pre>
+                            <!-- ▼ 추가: 월간/주간 라인차트 캔버스 -->
+                            <div class="qa-charts" id="qaCharts" style="display:flex; gap:16px; flex-wrap:wrap; margin-top:8px;">
+                                <div class="qa-chart" style="flex:1 1 360px; min-width:320px;">
+                                    <h4 style="margin:8px 0 6px;">월간 추이</h4>
+                                    <canvas id="qaMonthly" height="160" style="width:100%; display:block;"></canvas>
+                                </div>
+                                <div class="qa-chart" style="flex:1 1 360px; min-width:320px;">
+                                    <h4 style="margin:8px 0 6px;">주간 추이</h4>
+                                    <canvas id="qaWeekly" height="160" style="width:100%; display:block;"></canvas>
+                                </div>
+                            </div>
                         </div>
                         <div>
                             <label>상품명</label>
                             <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg">
                         </div>
                         <div class="keyword-recommend-container">
-                            <div id="keywordRecommendList" class="keyword-list-inline">
-                            </div>
+                            <div id="keywordRecommendList" class="keyword-list-inline"></div>
                         </div>
                         <div>
                             <label>최저가격</label>

@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <title>키워드 분석</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/typography.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/optimize.css}">
 </head>
 <body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 <div class="optimize-new">
     <div class="optimize-body">
         <div class="container">
@@ -21,8 +24,38 @@
             </div>
 
             <div class="analysis-result" style="margin-top: 20px;">
-                <h3>분석 결과 <span id="analysisStatus" style="font-size: 0.8em; color: #555;"></span></h3>
-                <pre id="analysisResult" style="background-color: #f4f4f4; border: 1px solid #ddd; padding: 15px; border-radius: 5px; min-height: 200px; white-space: pre-wrap; word-wrap: break-word;"></pre>
+                <h3>
+                    분석 결과
+                    <span id="analysisStatus" style="font-size: 0.8em; color: #555;"></span>
+                </h3>
+
+                <!-- 표 컨테이너 -->
+                <div id="analysisTableWrap" class="table-wrap">
+                    <table id="analysisTable" class="kw-table" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                        <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
+                            <th style="padding:10px 8px;">키워드</th>
+                            <th style="padding:10px 8px;">월 검색량</th>
+                            <th style="padding:10px 8px;">PC</th>
+                            <th style="padding:10px 8px;">모바일</th>
+                            <th style="padding:10px 8px;">평균 클릭수(PC/M)</th>
+                            <th style="padding:10px 8px;">평균 CTR(PC/M)</th>
+                            <th style="padding:10px 8px;">페이지 깊이</th>
+                            <th style="padding:10px 8px;">경쟁도</th>
+                        </tr>
+                        </thead>
+                        <tbody id="analysisTbody">
+                        <tr>
+                            <td colspan="8" style="padding:18px 8px; color:#6b7280;">
+                                검색어를 입력해 주세요.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 디버그용: 더 이상 보이지 않게 숨김 -->
+                <pre id="analysisResult" style="display:none;"></pre>
             </div>
         </div>
     </div>
