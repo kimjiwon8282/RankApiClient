@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const $ = (id) => document.getElementById(id);
 
     const statusEl    = $('status');
-    const greetingEl  = $('greeting');
     // 기존 변수명 유지: historyListEl → 이제 테이블의 <tbody id="historyList">
     const historyListEl = $('historyList');
 
@@ -23,8 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const nickname  = data.nickname;
         const histories = data.histories || [];
 
-        greetingEl.textContent = `${nickname}님의 히스토리 목록입니다.`;
-        statusEl.textContent = '';
+        statusEl.textContent = `${nickname}님의 예측 기록`;
 
         // 표 본문 초기화
         historyListEl.innerHTML = '';

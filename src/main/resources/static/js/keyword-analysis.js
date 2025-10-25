@@ -48,14 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `
         <tr style="border-bottom:1px solid #f1f5f9;">
-          <td style="padding:10px 8px;">${r.relKeyword ?? ''}</td>
-          <td style="padding:10px 8px; font-variant-numeric: tabular-nums;">${fmt(total)}</td>
-          <td style="padding:10px 8px; color:#475569; font-variant-numeric: tabular-nums;">${fmt(pc)}</td>
-          <td style="padding:10px 8px; color:#475569; font-variant-numeric: tabular-nums;">${fmt(mo)}</td>
-          <td style="padding:10px 8px; font-variant-numeric: tabular-nums;">${avePcClk} / ${aveMoClk}</td>
-          <td style="padding:10px 8px; font-variant-numeric: tabular-nums;">${avePcCtr} / ${aveMoCtr}</td>
-          <td style="padding:10px 8px;">${depth}</td>
-          <td style="padding:10px 8px;">${comp}</td>
+          <td style="padding:10px 20px;">${r.relKeyword ?? ''}</td>
+          <td style="padding:10px 20px; font-variant-numeric: tabular-nums;">${fmt(total)}</td>
+          <td style="padding:10px 20px; color:#475569; font-variant-numeric: tabular-nums;">${fmt(pc)}</td>
+          <td style="padding:10px 20px; color:#475569; font-variant-numeric: tabular-nums;">${fmt(mo)}</td>
+          <td style="padding:10px 20px; font-variant-numeric: tabular-nums;">${avePcClk} / ${aveMoClk}</td>
+          <td style="padding:10px 20px; font-variant-numeric: tabular-nums;">${avePcCtr} / ${aveMoCtr}</td>
+          <td style="padding:10px 20px;">${depth}</td>
+          <td style="padding:10px 20px;">${comp}</td>
         </tr>
       `;
         }).join('');
