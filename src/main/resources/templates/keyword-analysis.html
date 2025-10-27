@@ -6,58 +6,67 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/typography.css}">
     <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
-    <link rel="stylesheet" th:href="@{/css/optimize.css}">
+    <link rel="stylesheet" th:href="@{/css/keyword-analysis.css}">
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
-<div class="optimize-new">
-    <div class="optimize-body">
-        <div class="container">
+
+<!-- 페이지 전체 래퍼 -->
+<div class="analysis-page">
+    <div class="analysis-inner">
+        <div class="analysis-header">
             <h2>키워드 분석</h2>
             <p>분석하고 싶은 키워드를 입력하면, 저장된 연관 키워드 데이터를 보여줍니다.</p>
+        </div>
 
-            <div class="ai-input" style="margin-top: 20px;">
-                <div>
-                    <label for="query">분석 키워드</label>
-                    <input id="query" type="text" placeholder="예: 가지" style="width: 300px;">
-                </div>
+        <!-- 입력 영역 -->
+        <section class="analysis-input">
+            <div class="analysis-input-row">
+                <label for="query" class="analysis-input-label">분석 키워드</label>
+                <input id="query" type="text" class="analysis-input-field" placeholder="예: 가지">
             </div>
+        </section>
 
-            <div class="analysis-result" style="margin-top: 20px;">
-                <h3>
-                    분석 결과
-                    <span id="analysisStatus" style="font-size: 0.8em; color: #555;"></span>
-                </h3>
+        <!-- 결과 영역 -->
+        <section class="analysis-result">
+            <!-- 결과 테이블 카드 -->
+            <div class="analysis-table-card">
+                <div class="analysis-table-toolbar">
+                    <h3 class="analysis-result-title">
+                        연관 키워드
+                        <span id="analysisStatus" class="analysis-status"></span>
+                    </h3>
+                </div>
 
-                <!-- 표 컨테이너 -->
-                <div id="analysisTableWrap" class="table-wrap">
-                    <table id="analysisTable" class="kw-table" style="width:100%; border-collapse:collapse;">
+                <div class="analysis-table-scroll">
+                    <table id="analysisTable" class="analysis-table">
                         <thead>
-                        <tr style="text-align:left; border-bottom:1px solid #e5e7eb;">
-                            <th style="padding:10px 8px;">키워드</th>
-                            <th style="padding:10px 8px;">월 검색량</th>
-                            <th style="padding:10px 8px;">PC</th>
-                            <th style="padding:10px 8px;">모바일</th>
-                            <th style="padding:10px 8px;">평균 클릭수(PC/M)</th>
-                            <th style="padding:10px 8px;">평균 CTR(PC/M)</th>
-                            <th style="padding:10px 8px;">페이지 깊이</th>
-                            <th style="padding:10px 8px;">경쟁도</th>
+                        <tr>
+                            <th class="col-keyword">키워드</th>
+                            <th class="col-month">월 검색량</th>
+                            <th class="col-pc">PC</th>
+                            <th class="col-mobile">모바일</th>
+                            <th class="col-click">평균 클릭수(PC/M)</th>
+                            <th class="col-ctr">평균 CTR(PC/M)</th>
+                            <th class="col-depth">페이지 깊이</th>
+                            <th class="col-compet">경쟁도</th>
                         </tr>
                         </thead>
+
                         <tbody id="analysisTbody">
-                        <tr>
-                            <td colspan="8" style="padding:18px 8px; color:#6b7280;">
+                        <tr class="analysis-placeholder-row">
+                            <td colspan="8" class="analysis-placeholder-cell">
                                 검색어를 입력해 주세요.
                             </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
-
-                <!-- 디버그용: 더 이상 보이지 않게 숨김 -->
-                <pre id="analysisResult" style="display:none;"></pre>
             </div>
-        </div>
+
+            <!-- 디버그(JSON)는 숨김 -->
+            <pre id="analysisResult" style="display:none;"></pre>
+        </section>
     </div>
 </div>
 
@@ -65,5 +74,4 @@
 <script type="module" th:src="@{/js/keyword-analysis.js}"></script>
 
 </body>
-</html>
 </html>
