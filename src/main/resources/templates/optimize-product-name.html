@@ -10,124 +10,152 @@
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
+
 <div class="optimize-new">
     <div class="optimize-body">
         <div class="container">
+
             <div class=""><h2>상품명 최적화</h2></div>
+
             <div class="ai-section">
-                <!-- AI 입력 -->
+                <!-- 왼쪽 -->
                 <div class="ai-input ai-left">
-                    <h3>AI 예측</h3>
-                    <form id="aiForm">
-                        <div>
-                            <label>검색키워드</label>
-                            <input id="query" type="text" value="가지">
-                        </div>
-                        <div class="query-analysis-container">
-                            <pre id="queryAnalysisResult" class="qa-debug" aria-hidden="true"></pre>
-                            <!-- ▼ 추가: 월간/주간 라인차트 캔버스 -->
-                            <div class="qa-charts" id="qaCharts" style="display:flex; gap:16px; flex-wrap:wrap; margin-top:8px;">
-                                <div class="qa-chart" style="flex:1 1 360px; min-width:320px;">
-                                    <h4 style="margin:8px 0 6px;">월간 추이</h4>
-                                    <canvas id="qaMonthly" height="160" style="width:100%; display:block;"></canvas>
-                                </div>
-                                <div class="qa-chart" style="flex:1 1 360px; min-width:320px;">
-                                    <h4 style="margin:8px 0 6px;">주간 추이</h4>
-                                    <canvas id="qaWeekly" height="160" style="width:100%; display:block;"></canvas>
+
+                    <!-- 카드 1: 키워드 분석 -->
+                    <section class="card card-query">
+                        <h3>키워드 분석</h3>
+
+                        <form id="aiKeywordForm">
+                            <div>
+                                <label>검색키워드</label>
+                                <input id="query" type="text" value="가지">
+                            </div>
+
+                            <div id="graphSection" class="graph-section hidden">
+                                <!-- 디버그 JSON -->
+                                <pre id="queryAnalysisResult" class="qa-debug" aria-hidden="true"></pre>
+
+                                <!-- 차트 2개 -->
+                                <div class="qa-charts" id="qaCharts">
+                                    <div class="qa-chart">
+                                        <h4>월간 추이</h4>
+                                        <div class="chart-wrapper">
+                                            <canvas id="qaMonthly" height="160"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="qa-chart">
+                                        <h4>주간 추이</h4>
+                                        <div class="chart-wrapper">
+                                            <canvas id="qaWeekly" height="160"></canvas>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
+                            <div id="keywordSection" class="keyword-recommend-container">
+                                <div id="keywordRecommendList" class="keyword-list-inline"></div>
+                            </div>
+
+                            <div class="no-data-hint hidden" id="noDataHint">
+                                키워드 관련 데이터가 존재하지 않습니다.
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- 카드 2: 상품 정보 입력 -->
+                    <section class="card card-product">
+                        <h3>상품 정보 입력</h3>
+
+                        <form id="aiForm">
+                            <div>
+                                <label>상품명</label>
+                                <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg">
+                            </div>
+
+                            <div>
+                                <label>최저가격</label>
+                                <input id="lprice" type="number" value="3000">
+                            </div>
+
+                            <div>
+                                <label>최고가격</label>
+                                <input id="hprice" type="number" value="0">
+                            </div>
+
+                            <div>
+                                <label>쇼핑몰이름</label>
+                                <input id="mallName" type="text" value="-클릭마켓-">
+                            </div>
+
+                            <div>
+                                <label>브랜드명</label>
+                                <input id="brand" type="text" value="">
+                            </div>
+
+                            <div>
+                                <label>판매자</label>
+                                <input id="maker" type="text" value="">
+                            </div>
+
+                            <div class="category-row">
+                                <label>카테고리</label>
+                                <div class="category-group">
+                                    <select id="category1"></select>
+                                    <span>&gt;</span>
+                                    <select id="category2"></select>
+                                    <span>&gt;</span>
+                                    <select id="category3"></select>
+                                    <span>&gt;</span>
+                                    <select id="category4"></select>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="predict-action">
+                            <button id="btnPredict" type="button">예측하기</button>
+                            <span id="aiStatus"></span>
                         </div>
-                        <div>
-                            <label>상품명</label>
-                            <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg">
-                        </div>
-                        <div class="keyword-recommend-container">
-                            <div id="keywordRecommendList" class="keyword-list-inline"></div>
-                        </div>
-                        <div>
-                            <label>최저가격</label>
-                            <input id="lprice" type="number" value="3000">
-                        </div>
-                        <div>
-                            <label>최고가격</label>
-                            <input id="hprice" type="number" value="0">
-                        </div>
-                        <div>
-                            <label>쇼핑몰이름</label>
-                            <input id="mallName" type="text" value="-클릭마켓-">
-                        </div>
-                        <div>
-                            <label>브랜드명</label>
-                            <input id="brand" type="text" value="">
-                        </div>
-                        <div>
-                            <label>판매자</label>
-                            <input id="maker" type="text" value="">
-                        </div>
-<!--                        <div>-->
-<!--                            <label>상품ID</label>-->
-<!--                            <input id="productId" type="text" value="82585481684">-->
-<!--                        </div>-->
-<!--                        <div>-->
-<!--                            <label>상품유형</label>-->
-<!--                            <input id="productType" type="text" value="2">-->
-<!--                        </div>-->
-                        <div>
-                            <label>카테고리1</label>
-                            <select id="category1"></select>
-                        </div>
-                        <div>
-                            <label>카테고리2</label>
-                            <select id="category2"></select>
-                        </div>
-                        <div>
-                            <label>카테고리3</label>
-                            <select id="category3"></select>
-                        </div>
-                        <div>
-                            <label>카테고리4</label>
-                            <select id="category4"></select>
-                        </div>
-                    </form>
-                    <div>
-                        <button id="btnPredict" type="button">예측하기</button>
-                        <span id="aiStatus"></span>
-                    </div>
+                    </section>
                 </div>
 
+                <!-- 오른쪽 -->
                 <div class="ai-right">
-                    <!-- AI 예측 결과(랭크) 출력 -->
-                    <div class="ai-output" id="aiResultBox">
-                        <h3>AI 예측 결과</h3>
-                        <div class="rank-box">
-                            <!-- 사용자에게 보이는 값 -->
-                            <p>예측 랭크는...</p>
-                            <p class="rank-value" id="predRankClipped">00.00</p>
-                            <!-- 숨김 -->
-                            <div style="display:none;">pred_rank: <span id="predRank"></span></div>
-                            <div style="display:none;">query: <span id="respQuery"></span></div>
-                            <div style="display:none;">title: <span id="respTitle"></span></div>
-                            <div style="display:none;">exp_id: <span id="expId"></span></div>
+                    <section class="card card-result">
+
+                        <div class="ai-output" id="aiResultBox">
+                            <h3>AI 예측 결과</h3>
+                            <div class="rank-box">
+                                <p>예측 랭크는...</p>
+                                <p class="rank-value" id="predRankClipped">00.00</p>
+
+                                <div style="display:none;">pred_rank: <span id="predRank"></span></div>
+                                <div style="display:none;">query: <span id="respQuery"></span></div>
+                                <div style="display:none;">title: <span id="respTitle"></span></div>
+                                <div style="display:none;">exp_id: <span id="expId"></span></div>
+                            </div>
                         </div>
-                    </div>
-                    <!-- 히스토리 보기 및 저장 -->
-                    <div class="history">
-                        <div class="show-history">
-                            <a href="/my-history">
-                                <button type="button">내 히스토리 보기</button>
-                            </a>
+
+                        <div class="history">
+                            <div class="show-history">
+                                <a href="/my-history">
+                                    <button type="button">내 히스토리 보기</button>
+                                </a>
+                            </div>
+                            <div class="save-history">
+                                <button id="btnSave" type="button">히스토리 저장하기</button>
+                                <span id="saveStatus"></span>
+                            </div>
                         </div>
-                        <div class="save-history">
-                            <button id="btnSave" type="button">히스토리 저장하기</button>
-                            <span id="saveStatus"></span>
-                        </div>
-                    </div>
+
+                    </section>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
-<!-- JS 파일 -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:src="@{/js/token.js}"></script>
 <script type="module" th:src="@{/js/api.js}"></script>
 <script type="module" th:src="@{/js/category.js}"></script>

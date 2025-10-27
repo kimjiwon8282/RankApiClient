@@ -5,12 +5,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const queryInput = document.getElementById('query');
     const analysisResultEl = document.getElementById('queryAnalysisResult');
 
-    // 마지막으로 그렸던 데이터(리사이즈 대응)
+    // 마지막으로 그렸던 전체 응답 (리사이즈 재렌더 용)
     let lastChartData = null;
     let debounceTimer;
 
-    // ─────────────────────────────────────────────────────────────────────────────
-    // 유틸: 디바운스
+    // ─────────────────────────────────────────────────────────────
+    // 디바운스 유틸
     const debounce = (func, delay) => {
         return function (...args) {
             clearTimeout(debounceTimer);
@@ -18,29 +18,145 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
-    // ─────────────────────────────────────────────────────────────────────────────
-    // 차트 그리기 유틸
-    const clearCanvas = (id) => {
-        const canvas = document.getElementById(id);
-        if (!canvas) return;
-        const dpr = window.devicePixelRatio || 1;
-        const parentWidth = canvas.parentElement ? canvas.parentElement.clientWidth : canvas.clientWidth || 600;
-        const baseHeight = Number(canvas.getAttribute('height') || 160);
+    // ─────────────────────────────────────────────────────────────
+    // Chart.js 차트 인스턴스 전역 보관
+    let monthlyChartInstance = null;
+    let weeklyChartInstance = null;
 
-        canvas.width = Math.max(320, parentWidth * dpr);
-        canvas.height = baseHeight * dpr;
-
-        const ctx = canvas.getContext('2d');
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.scale(dpr, dpr);
+    // Chart.js config 빌더
+    const buildLineChartConfig = (labels, dataValues, datasetLabelText) => {
+        return {
+            type: 'line',
+            data: {
+                labels: labels, // 예: ['10.01', '10.08', ...]
+                datasets: [
+                    {
+                        label: datasetLabelText,
+                        data: dataValues, // 예: [32, 45, 50, ...]
+                        fill: false,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        borderWidth: 2,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // canvas height 기준으로 맞추기
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => value.toString()
+                        },
+                        grid: {
+                            color: '#e5e7eb'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 6,
+                        },
+                        grid: {
+                            color: '#f3f4f6'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            // 날짜(타이틀) → 작게, 회색으로 표시
+                            title: function (tooltipItems) {
+                                const date = tooltipItems[0].label;
+                                return `날짜: ${date}`;
+                            },
+                            // 값(라벨) → 크게, 단위 % 붙이기
+                            label: function (tooltipItem) {
+                                const value = tooltipItem.formattedValue;
+                                return `검색 비율: ${value}%`;
+                            }
+                        },
+                        // 시각적 스타일 커스터마이징
+                        titleColor: '#9ca3af',      // 회색(기본 Tailwind gray-400)
+                        titleFont: { size: 10, weight: 'normal' },
+                        bodyColor: '#111827',       // 검은색 텍스트
+                        bodyFont: { size: 13, weight: 'bold' },
+                        backgroundColor: 'rgba(255,255,255,0.9)',
+                        borderColor: '#d1d5db',
+                        borderWidth: 1,
+                        boxPadding: 4,
+                        padding: 8,
+                        displayColors: false, // 왼쪽 색상 네모 제거
+                    },
+                }
+            }
+        };
     };
 
+    // 특정 canvasId에 차트를 그리는 함수
+    const drawLineChartWithChartJS = (canvasId, chartKey, labels, values, labelText) => {
+        const canvasEl = document.getElementById(canvasId);
+        if (!canvasEl) return;
+
+        // 기존 차트가 있으면 파괴 (중복 생성 방지)
+        if (chartKey === 'monthly' && monthlyChartInstance) {
+            monthlyChartInstance.destroy();
+            monthlyChartInstance = null;
+        }
+        if (chartKey === 'weekly' && weeklyChartInstance) {
+            weeklyChartInstance.destroy();
+            weeklyChartInstance = null;
+        }
+
+        const ctx = canvasEl.getContext('2d');
+        const config = buildLineChartConfig(labels, values, labelText);
+
+        if (chartKey === 'monthly') {
+            monthlyChartInstance = new Chart(ctx, config);
+        } else if (chartKey === 'weekly') {
+            weeklyChartInstance = new Chart(ctx, config);
+        }
+    };
+
+    // 차트 전부 초기화 (데이터 없을 때 등)
     const clearCharts = () => {
-        clearCanvas('qaMonthly');
-        clearCanvas('qaWeekly');
+        if (monthlyChartInstance) {
+            monthlyChartInstance.destroy();
+            monthlyChartInstance = null;
+        }
+        if (weeklyChartInstance) {
+            weeklyChartInstance.destroy();
+            weeklyChartInstance = null;
+        }
+
+        // 캔버스 지우기 (선택)
+        const m = document.getElementById('qaMonthly');
+        const w = document.getElementById('qaWeekly');
+        if (m) {
+            const ctx = m.getContext('2d');
+            ctx && ctx.clearRect(0, 0, m.width, m.height);
+        }
+        if (w) {
+            const ctx = w.getContext('2d');
+            ctx && ctx.clearRect(0, 0, w.width, w.height);
+        }
+
+        const graphSection = document.getElementById('graphSection');
+        if (graphSection) {
+            graphSection.classList.add('hidden');
+        }
     };
 
+    // 네이버(또는 DB) 응답 배열을 그래프 friendly하게 변환
+    // items: [{ period: "...", ratio: ...}, ...]
+    // labelFmt: period 문자열 -> 축에 찍을 라벨로 변환하는 함수
     const parseSeries = (items, labelFmt) => {
         if (!Array.isArray(items)) return [];
         const sorted = [...items].sort((a, b) => String(a.period).localeCompare(String(b.period)));
@@ -50,146 +166,120 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     };
 
-    const drawLineChart = (canvasId, series, { color = '#2563eb' } = {}) => {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-
-        // 리사이즈 및 초기화
-        const dpr = window.devicePixelRatio || 1;
-        const parentWidth = canvas.parentElement ? canvas.parentElement.clientWidth : canvas.clientWidth || 600;
-        const baseHeight = Number(canvas.getAttribute('height') || 160);
-
-        canvas.width = Math.max(320, parentWidth * dpr);
-        canvas.height = baseHeight * dpr;
-
-        const ctx = canvas.getContext('2d');
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.scale(dpr, dpr);
-
-        const width = canvas.width / dpr;
-        const height = canvas.height / dpr;
-
-        const pad = { t: 14, r: 12, b: 28, l: 36 };
-        const plotW = width - pad.l - pad.r;
-        const plotH = height - pad.t - pad.b;
-
-        const xs = series.map(s => s.label);
-        const ys = series.map(s => s.value);
-
-        if (xs.length === 0) {
-            ctx.fillStyle = '#6b7280';
-            ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-            ctx.fillText('데이터가 없습니다', pad.l, pad.t + 16);
+    // 실제 차트를 갱신하는 핵심 함수
+    const renderQueryCharts = (data) => {
+        if (!data) {
+            clearCharts();
             return;
         }
 
-        const minY = Math.min(0, ...ys);
-        const maxY = Math.max(100, ...ys); // ratio가 보통 0~100
-        const yRange = maxY - minY || 1;
-
-        // 그리드
-        ctx.strokeStyle = '#e5e7eb';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        for (let g = 0; g <= 4; g++) {
-            const y = pad.t + (plotH * g / 4);
-            ctx.moveTo(pad.l, y);
-            ctx.lineTo(width - pad.r, y);
-        }
-        ctx.stroke();
-
-        // y라벨
-        ctx.fillStyle = '#6b7280';
-        ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
-        for (let g = 0; g <= 4; g++) {
-            const val = (maxY - yRange * g / 4);
-            const y = pad.t + (plotH * g / 4) + 4;
-            ctx.fillText(val.toFixed(0), 6, y);
-        }
-
-        // x라벨 (너무 많으면 간격 띄움)
-        const step = Math.ceil(xs.length / 6) || 1;
-        xs.forEach((lab, i) => {
-            if (i % step !== 0) return;
-            const x = pad.l + (plotW * (xs.length <= 1 ? 0 : i / (xs.length - 1)));
-            ctx.fillText(lab, x - 8, height - 8);
-        });
-
-        // 라인
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        series.forEach((pt, i) => {
-            const x = pad.l + (plotW * (series.length <= 1 ? 0 : i / (series.length - 1)));
-            const y = pad.t + plotH * (1 - ((pt.value - minY) / yRange));
-            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-
-        // 포인트
-        ctx.fillStyle = color;
-        series.forEach((pt, i) => {
-            const x = pad.l + (plotW * (series.length <= 1 ? 0 : i / (series.length - 1)));
-            const y = pad.t + plotH * (1 - ((pt.value - minY) / yRange));
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, Math.PI * 2);
-            ctx.fill();
-        });
-    };
-
-    // ⬇ 기존 renderQueryCharts 를 이걸로 교체
-    const renderQueryCharts = (data) => {
-        if (!data) { clearCharts(); return; }
-
-        // 응답 키가 대/소문자 섞여 올 수도 있으니 모두 대비
+        // monthlyResponse / weeklyResponse 케이스 모두 대비
         const mRes = data.monthlyResponse ?? data.MonthlyResponse;
         const wRes = data.weeklyResponse ?? data.WeeklyResponse;
 
-        // 실제 배열 위치: results[0].data
+        // results[0].data 형태라고 가정
         const monthlyRaw = mRes?.results?.[0]?.data ?? [];
         const weeklyRaw  = wRes?.results?.[0]?.data ?? [];
 
+        const graphSection = document.getElementById('graphSection');
+
+        const hasMonthly = Array.isArray(monthlyRaw) && monthlyRaw.length > 0;
+        const hasWeekly = Array.isArray(weeklyRaw) && weeklyRaw.length > 0;
+        const hasAny = hasMonthly || hasWeekly;
+
+        if (!hasAny) {
+            clearCharts();
+            if (graphSection) {
+                graphSection.classList.add('hidden');
+            }
+            return;
+        } else {
+            if (graphSection) {
+                graphSection.classList.remove('hidden');
+            }
+        }
+
         // 라벨 포맷터
+        // 월간: 'YYYY-MM-DD', 'YYYYMMDD', 'YYYYMM' 등을 'YY.MM' 식으로
         const fmtMonth = (p) => {
-            // 'YYYY-MM-DD' 또는 'YYYYMMDD' -> 'YY.MM'
-            if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return `${p.slice(2,4)}.${p.slice(5,7)}`;
-            if (/^\d{8}$/.test(p))            return `${p.slice(2,4)}.${p.slice(4,6)}`;
-            if (/^\d{6}$/.test(p))            return `${p.slice(2,4)}.${p.slice(4,6)}`;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return `${p.slice(2,4)}.${p.slice(5,7)}`; // 2025-10-27 -> 25.10
+            if (/^\d{8}$/.test(p))            return `${p.slice(2,4)}.${p.slice(4,6)}`; // 20251027 -> 25.10
+            if (/^\d{6}$/.test(p))            return `${p.slice(2,4)}.${p.slice(4,6)}`; // 202510 -> 25.10
             return p;
         };
+
+        // 주간: 날짜 시작일 같은 값이면 'MM.DD' 형식 등으로 단순화
         const fmtWeek = (p) => {
-            // 주간도 날짜 형태로 내려오므로 'MM.DD' 정도로 축약
-            if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return `${p.slice(5,7)}.${p.slice(8,10)}`;
-            if (/^\d{8}$/.test(p))            return `${p.slice(4,6)}.${p.slice(6,8)}`;
+            if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return `${p.slice(5,7)}.${p.slice(8,10)}`; // 2025-10-27 -> 10.27
+            if (/^\d{8}$/.test(p))            return `${p.slice(4,6)}.${p.slice(6,8)}`;  // 20251027 -> 10.27
             return p.replace('W', '-W');
         };
 
-        const monthly = parseSeries(monthlyRaw, fmtMonth);
-        const weekly  = parseSeries(weeklyRaw,  fmtWeek);
+        // 가공된 데이터
+        const monthly = parseSeries(monthlyRaw, fmtMonth); // [{label:'25.10', value:32}, ...]
+        const weekly  = parseSeries(weeklyRaw,  fmtWeek);  // [{label:'10.20', value:44}, ...]
 
-        drawLineChart('qaMonthly', monthly, { color: '#2563eb' });
-        drawLineChart('qaWeekly',  weekly,  { color: '#10b981' });
+        // Chart.js에 넣을 labels / data
+        const monthLabels = monthly.map(pt => pt.label);
+        const monthValues = monthly.map(pt => pt.value);
+        const weekLabels  = weekly.map(pt => pt.label);
+        const weekValues  = weekly.map(pt => pt.value);
+
+        // 월간 차트
+        drawLineChartWithChartJS(
+            'qaMonthly',
+            'monthly',
+            monthLabels,
+            monthValues,
+            '월간 검색 비율(%)'
+        );
+
+        // 주간 차트
+        drawLineChartWithChartJS(
+            'qaWeekly',
+            'weekly',
+            weekLabels,
+            weekValues,
+            '주간 검색 비율(%)'
+        );
     };
 
-    // 리사이즈 시 다시 그리기
+    // 창 크기 변경 시 차트 재렌더 (반응형 유지)
     window.addEventListener('resize', () => {
-        if (lastChartData) renderQueryCharts(lastChartData);
+        if (lastChartData) {
+            renderQueryCharts(lastChartData);
+        }
     });
 
-    // ─────────────────────────────────────────────────────────────────────────────
-    // 데이터 로드
+    // ─────────────────────────────────────────────────────────────
+    // 백엔드에서 키워드 분석 데이터 불러오기
     const fetchAnalysisData = async (query) => {
-        // ⬇⬇ 타이포 수정됨: !query || !query.trim()
         if (!query || !query.trim()) {
-            analysisResultEl.textContent = ''; // 검색어 없으면 비움
-            clearCharts();
+            // 검색어가 비어있는 상태 (초기 상태)
+            analysisResultEl.textContent = '';
+
+            clearCharts(); // 그래프 섹션 숨기기 등
+
+            // 전역 플래그 업데이트
+            window.__dataFlags = window.__dataFlags || {
+                hasKeywordData: false,
+                hasChartData: false
+            };
+            window.__dataFlags.hasChartData = false;
+
+            // 이 상태에서는 "데이터가 존재하지 않습니다" 안내문을 보여주면 안 된다.
+            const noDataHintEl = document.getElementById('noDataHint');
+            if (noDataHintEl) {
+                noDataHintEl.classList.add('hidden');
+            }
+
             return;
         }
 
         analysisResultEl.textContent = '데이터 분석 중...';
 
         try {
+            // 네가 이미 쓰고 있는 API 그대로 재사용
             const url = `/naver/api/category-trend?query=${encodeURIComponent(query)}`;
             const res = await httpRequest('GET', url);
 
@@ -200,9 +290,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await res.json();
 
-            // JSON은 계속 pre에 보여주되, 그래프도 렌더링
+            // 디버그 JSON 그대로 보여주기
             analysisResultEl.textContent = JSON.stringify(data, null, 2);
+
+            // 차트 렌더
             renderQueryCharts(data);
+
+            // 리사이즈 대비 저장
             lastChartData = data;
 
         } catch (error) {
@@ -212,12 +306,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 입력 디바운스 후 호출 (600ms)
+    // 입력 값이 바뀔 때마다 디바운스 후 분석 데이터 로드
     queryInput.addEventListener('input', debounce(e => {
         fetchAnalysisData(e.target.value);
     }, 600));
 
-    // 초기 값이 있으면 즉시 실행
+    // 페이지 첫 로드시 input에 값 있으면 자동으로 호출
     if (queryInput.value) {
         fetchAnalysisData(queryInput.value);
     }

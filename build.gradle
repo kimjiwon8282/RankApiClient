@@ -42,7 +42,7 @@ dependencies {
 	//데이터베이스
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'mysql:mysql-connector-java:8.0.33'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// Spring Security + OAuth2 & JWT
 	implementation 'org.springframework.boot:spring-boot-starter-security'

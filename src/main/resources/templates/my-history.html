@@ -6,80 +6,20 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/typography.css}">
     <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
-
-    <style>
-        :root{
-            --card:#fff; --line:#e8edf3; --text:#1f3349; --muted:#6b7280;
-            --accent:#2563eb; --good:#10b981;
-            --radius:14px; --shadow:0 6px 20px rgba(0,0,0,.06);
-        }
-
-        .history-header{ text-align:center; margin:42px 0 10px; }
-        .history-header h2{ margin:0; }
-        .history-header p{ color:var(--muted); margin:8px 0 0; }
-        #status{ text-align:center; color:var(--muted); margin:10px 0 16px; }
-
-        /* 테이블 카드 */
-        .history-table { max-width: 1040px; margin: 0 auto 32px; padding: 0 16px; }
-        .table-card {
-            background:#fff; border:1px solid var(--line); border-radius:var(--radius);
-            box-shadow:var(--shadow);
-        }
-        .table-toolbar {
-            display:flex; align-items:center; justify-content:space-between;
-            padding:12px 16px;
-        }
-        .table-toolbar h3{ margin:0; font-size:16px; }
-
-        .table-scroll { max-height:520px; overflow:auto; border-top:1px solid #eef2f6; }
-
-        table.table { width:100%; border-collapse:separate; border-spacing:0; }
-        .table thead th{
-            position:sticky; top:0; z-index:1;
-            background:#f8fafc; color:#374151; font-weight:700;
-            text-align:left; font-size:13px; padding:10px 12px;
-            border-bottom:1px solid var(--line);
-        }
-        .table tbody td{
-            padding:10px 12px; font-size:14px; border-bottom:1px solid #f1f5f9;
-            color:var(--text); vertical-align:middle;
-        }
-        /* 열 너비/말줄임 */
-        .col-query{ width:22%; }
-        .col-title{ width:46%; }
-        .col-rank{ width:14%; white-space:nowrap; }
-        .col-date{ width:18%; white-space:nowrap; }
-        .table td, .table th { max-width:1px; }
-        .ellipsis{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-
-        /* 행 효과 / 랭크 배지 */
-        .table tbody tr:hover{ background:#f9fbff; }
-        .rank-badge{
-            display:inline-block; min-width:42px; text-align:center;
-            padding:4px 8px; border-radius:10px; font-weight:700; font-size:13px;
-            background:#eef2ff; color:var(--accent);
-        }
-        .rank-badge.top10{ background:#ecfdf5; color:var(--good); }
-
-        .back-home{ text-align:center; margin: 10px 0 40px; }
-        .back-home .btn{ padding:10px 16px; border-radius:10px; background:#2f66d0; color:#fff; border:none; cursor:pointer; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/my-history.css}">
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <div class="history-header">
     <h2>내 히스토리</h2>
-    <p id="greeting">내역을 불러오는 중...</p>
 </div>
-
-<p id="status"></p>
 
 <!-- 표 뷰 -->
 <section class="history-table">
     <div class="table-card">
         <div class="table-toolbar">
-            <h3>예측 기록</h3>
+            <p id="status">히스토리 불러오는 중...</p>
             <!-- (선택) 검색/정렬 컨트롤 자리 -->
         </div>
 

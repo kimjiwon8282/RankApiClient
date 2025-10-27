@@ -5,10 +5,10 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
-#    #redis
-#    redis:
-#      host: localhost
-#      port: 6379
+  #    #redis
+  #    redis:
+  #      host: localhost
+  #      port: 6379
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -95,4 +95,4 @@ spring:
     issuer: ${JWT_ISSUER}
     secret-key: ${JWT_SECRET_KEY}
 
-  FASTAPI_URL: ${FASTAPI_URL}
+FASTAPI_URL: ${FASTAPI_URL}
