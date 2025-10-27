@@ -6,6 +6,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const queryInput = document.getElementById('query');
     const recommendListEl = document.getElementById('keywordRecommendList');
 
+    // 전역 상태 초기화/보장
+    window.__dataFlags = window.__dataFlags || {
+        hasKeywordData: false,
+        hasChartData: false
+    };
+
+    const noDataHintEl = document.getElementById('noDataHint');
+
+    const updateNoDataHint = () => {
+        if (!noDataHintEl) return;
+        const { hasKeywordData, hasChartData } = window.__dataFlags;
+        if (!hasKeywordData && !hasChartData) {
+            noDataHintEl.classList.remove('hidden');
+        } else {
+            noDataHintEl.classList.add('hidden');
+        }
+    };
+
     let debounceTimer;
 
     // API 호출을 지연시키는 디바운스 함수입니다.
@@ -22,7 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const fetchRecommendedKeywords = async (query) => {
         // 검색어가 비어있으면 목록을 지웁니다.
         if (!query || !query.trim()) {
+            // 사용자가 아직 검색어를 입력하지 않은 초기 상태.
+            // 이때는 안내문구(noDataHint)를 보여주지 않는다.
             recommendListEl.innerHTML = '';
+
+            window.__dataFlags.hasKeywordData = false;
+
+            const noDataHintEl = document.getElementById('noDataHint');
+            if (noDataHintEl) {
+                noDataHintEl.classList.add('hidden');
+            }
             return;
         }
 
@@ -34,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await res.json();
             const keywords = data.recommended || [];
+
+            // 키워드 리스트 채우기 전 상태 갱신
+            window.__dataFlags.hasKeywordData = keywords.length > 0;
 
             recommendListEl.innerHTML = ''; // 이전 결과를 지웁니다.
 
@@ -69,11 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     keywordContainer.appendChild(chip);
                 });
+            } else {
+                window.__dataFlags.hasKeywordData = false;
             }
+            updateNoDataHint();
 
         } catch (error) {
             console.error('추천 키워드를 가져오는 데 실패했습니다:', error);
             recommendListEl.innerHTML = ''; // 오류 발생 시 목록을 비웁니다.
+            window.__dataFlags.hasKeywordData = false;
+            updateNoDataHint();
         }
     };
 
