@@ -19,7 +19,7 @@
 
 .optimize-new .optimize-body .container {
     width: 80%;
-    max-width: 1200px;
+    max-width: 1400px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -34,7 +34,7 @@
 .optimize-new .optimize-body .container .ai-section {
     width: 100%;
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 5fr 3fr;
     gap: 60px;
 }
 
@@ -57,7 +57,6 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.03);
     padding: 24px;
     box-sizing: border-box;
-
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -66,9 +65,9 @@
 /* 카드 제목 */
 .card > h3 {
     margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #1f2937;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111111;
 }
 
 /* ===== 폼 공통 ===== */
@@ -90,9 +89,9 @@
 .ai-input form > div > label {
     width: 100px;
     text-align: left;
-    margin-right: 10px;
-    font-size: 14px;
-    font-weight: 500;
+    margin-right: 4px;
+    font-size: 16px;
+    font-weight: 600;
     color: #374151;
 }
 
@@ -103,7 +102,7 @@
     padding: 8px 16px;
     border: 1px solid #E4E4E4;
     border-radius: 9999px;
-    font-size: 14px;
+    font-size: 16px;
     background-color: #fff;
     box-sizing: border-box;
 }
@@ -147,12 +146,12 @@
 
 .ai-right .ai-output .rank-box {
     width: 100%;
+    min-width: 380px;
     height: 320px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     background: #F5F5F5;
     border: none;
     border-radius: 40px;
@@ -284,16 +283,6 @@
     flex-wrap: nowrap !important;
 }
 
-/* 라벨은 기존 입력폼과 동일 폭 유지 */
-.category-row > label {
-    width: 100px;
-    text-align: left;
-    margin-right: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-}
-
 /* 카테고리 선택박스 그룹 */
 .category-group {
     flex: 1;
@@ -310,7 +299,7 @@
     padding: 8px 12px;
     border: 1px solid #E4E4E4;
     border-radius: 9999px;
-    font-size: 14px;
+    font-size: 16px;
     background-color: #fff;
 }
 
@@ -338,6 +327,13 @@
     min-width: 320px;
 }
 
+.qa-chart > h4 {
+    margin: 8px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #36A2EB;
+}
+
 .no-data-hint {
     font-size: 14px;
     color: #6B7280;
@@ -350,4 +346,16 @@
 
 .hidden {
     display: none !important;
+}
+.page-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.page-title h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    text-align: center;
 }
