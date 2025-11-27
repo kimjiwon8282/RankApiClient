@@ -44,6 +44,9 @@ public class WebOAuthSecurityConfig {
     /** 유저 조회 및 기타 비즈니스 로직을 수행하는 서비스 */
     private final UserService userService;
 
+    // 로그아웃 핸들러
+    private final TokenLogoutHandler tokenLogoutHandler;
+
 
     // --- 정적 리소스 및 H2 콘솔 제외 ------------------------------------------------
 
@@ -82,6 +85,7 @@ public class WebOAuthSecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")               // 로그아웃 처리 엔드포인트
                         .logoutSuccessUrl("/login")         // 로그아웃 후 리다이렉트할 URL
+                        .addLogoutHandler(tokenLogoutHandler)
                         .deleteCookies("refresh_token")     // HTTP 쿠키에 저장된 리프레시 토큰 삭제
                         .invalidateHttpSession(true)        // (만약 세션이 남아 있다면) 세션 무효화
                         .permitAll()                        // 로그아웃 엔드포인트는 누구나 호출 가능
