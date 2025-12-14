@@ -90,9 +90,6 @@ AI Model Server (Separate Repository)
 
 ## 5. Related Repositories
 
-- Backend API  
-  https://github.com/kimjiwon8282/RankApiClient
-
 - AI Model Server  
   https://github.com/kimjiwon8282/RankitAI
 
