@@ -1,7 +1,8 @@
 # 🏆 Rankit – SmartStore Product Ranking Prediction Platform (Backend)
 
 Java & Spring Boot 기반으로  
-**SmartStore 상품 데이터를 수집·분석하고, 랭킹 예측을 지원하는 백엔드 시스템**입니다.
+SmartStore 상품 데이터를 수집·분석하고,  
+AI 모델 서버와 연동되는 **백엔드 아키텍처를 설계·구현한 시스템**입니다.
 
 🔗 **Service URL**  
 http://rankit-env.eba-qahh7i2w.ap-northeast-2.elasticbeanstalk.com/home
@@ -30,7 +31,7 @@ SmartStore 판매자는 다음과 같은 문제를 겪습니다.
 - Java & Spring Boot 기반 REST API
 - 네이버 외부 API 연동
 - MongoDB 기반 데이터 저장 및 캐싱
-- AI 모델 서버와 분리된 구조
+- AI 모델 서버와 분리된 구조 (보안 강화를 위해 AI 서버는 외부 접근 차단, 내부 통신만 허용)
 - AWS 환경 배포
 
 ```text
@@ -50,10 +51,11 @@ AI Model Server (Separate Repository)
 
 ## 3. Key Design Decisions
 
-### 🔐 Stateless Authentication (JWT + OAuth2)
+### 🔐 Stateless Authentication (확장성을 고려한 인증 설계)
 - 세션 기반 인증의 확장성 한계를 고려하여 JWT 기반 인증 구조 채택
 - Access Token / Refresh Token 분리
 - Refresh Token은 HttpOnly Cookie + DB 저장 방식으로 보안 강화
+- OAuth2 소셜 로그인을 JWT 기반 무상태 인증 구조에 통합
 
 ---
 
@@ -77,7 +79,8 @@ AI Model Server (Separate Repository)
 - JWT, OAuth2  
 
 **Database**  
-- MongoDB, RDBMS  
+- MongoDB (외부 API 응답, 비정형 데이터 캐싱)  
+- RDBMS (사용자, 인증, 서비스 핵심 정형 데이터)
 
 **Cloud & DevOps**  
 - AWS Elastic Beanstalk, EC2, RDS  
