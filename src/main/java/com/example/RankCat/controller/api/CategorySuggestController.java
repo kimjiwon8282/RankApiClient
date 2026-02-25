@@ -16,14 +16,10 @@ public class CategorySuggestController {
 
     private final CategorySuggestService categorySuggestService;
 
-    /**
-     * 예: GET /api/categories/suggest?query=쌈채소&topN=10
-     */
+    /** 예: GET /api/categories/suggest?query=쌈채소&topN=10 */
     @GetMapping("/suggest")
     public ResponseEntity<CategorySuggestResponse> suggest(
-            @RequestParam String query,
-            @RequestParam(defaultValue = "10") int topN
-    ) {
+            @RequestParam String query, @RequestParam(defaultValue = "10") int topN) {
         return ResponseEntity.ok(categorySuggestService.suggestByQuery(query, topN));
     }
 }

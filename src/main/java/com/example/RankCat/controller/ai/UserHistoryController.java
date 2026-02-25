@@ -29,9 +29,11 @@ public class UserHistoryController {
 
         if (principal == null) return ResponseEntity.status(401).build();
 
-        String email = principal.getUsername();            // 토큰의 sub(=email)
-        User user = userRepository.findByEmail(email)      // 도메인 User 재조회
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        String email = principal.getUsername(); // 토큰의 sub(=email)
+        User user =
+                userRepository
+                        .findByEmail(email) // 도메인 User 재조회
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
         userHistoryService.save(user, req);
         return ResponseEntity.ok().build();
@@ -47,8 +49,10 @@ public class UserHistoryController {
         }
 
         // principal.getUsername() == 이메일
-        User loginUser = userRepository.findByEmail(principal.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loginUser =
+                userRepository
+                        .findByEmail(principal.getUsername())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
         UserHistoryResponse response = userHistoryService.getUserHistories(loginUser);
         return ResponseEntity.ok(response);

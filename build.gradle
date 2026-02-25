@@ -2,7 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.5'
 	id 'io.spring.dependency-management' version '1.1.7'
-}
+	//spotless플러그인 추가
+	id 'com.diffplug.spotless' version '6.25.0'}
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -73,6 +74,24 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
+// --- Spotless 설정 블록 ---
+spotless {
+	java {
+		// 적용할 자바 파일 경로 지정
+		target '**/*.java'
+
+		// 사용하지 않는 import 제거
+		removeUnusedImports()
+
+		// 구글 자바 포맷 적용 (버전 지정 가능, 기본값 사용)
+		googleJavaFormat().aosp()
+
+		// 끝에 빈 줄 추가, 불필요한 공백 제거
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+}
+
 // 1. JUnit 플랫폼 선언 (선택 사항, 있어도 무방)
 tasks.named('test') {
 	useJUnitPlatform()
@@ -85,4 +104,8 @@ tasks.withType(Test) {
 
 jar{
 	enabled=false
+}
+// 자바 코드를 컴파일하기 전에 무조건 spotlessApply를 먼저 실행하도록 설정
+tasks.named('compileJava') {
+	dependsOn 'spotlessApply'
 }

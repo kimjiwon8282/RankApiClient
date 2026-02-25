@@ -13,11 +13,12 @@ public class MongoConfig {
     private String mongoUri;
 
     @Bean
-    public MongoClient mongoClient(){
+    public MongoClient mongoClient() {
         return MongoClients.create(mongoUri);
     }
+
     @Bean
-    public MongoTemplate mongoTemplate(){
+    public MongoTemplate mongoTemplate() {
         return new MongoTemplate(mongoClient(), "rankcat");
     }
 }

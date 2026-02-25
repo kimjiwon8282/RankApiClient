@@ -1,25 +1,24 @@
 package com.example.RankCat.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
-
 @Getter
-@NoArgsConstructor(access= AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class UserHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    //소유 사용자
+    // 소유 사용자
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @CreationTimestamp
@@ -35,8 +34,10 @@ public class UserHistory {
     private String brand;
     private String maker;
     private String productId;
+
     /** FastAPI 요청에서 문자열이므로 String 으로 저장 */
     private String productType;
+
     private String category1;
     private String category2;
     private String category3;
@@ -47,13 +48,23 @@ public class UserHistory {
     private Double predRankClipped;
 
     @Builder
-    public UserHistory(User user,
-                       String query, String title,
-                       Integer lprice, Integer hprice,
-                       String mallName, String brand, String maker,
-                       String productId, String productType,
-                       String category1, String category2, String category3, String category4,
-                       Double predRank, Double predRankClipped) {
+    public UserHistory(
+            User user,
+            String query,
+            String title,
+            Integer lprice,
+            Integer hprice,
+            String mallName,
+            String brand,
+            String maker,
+            String productId,
+            String productType,
+            String category1,
+            String category2,
+            String category3,
+            String category4,
+            Double predRank,
+            Double predRankClipped) {
         this.user = user;
         this.query = query;
         this.title = title;

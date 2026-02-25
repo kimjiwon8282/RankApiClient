@@ -14,8 +14,10 @@ import org.springframework.web.client.RestTemplate;
 public class PredictionServiceImpl implements PredictionService {
 
     private final RestTemplate fastApiRestTemplate;
+
     @Value("${FASTAPI_URL}")
     private String fastApiUrl;
+
     // [추가] FastAPI 서버의 상태를 체크하는 테스트 메소드
 
     @Override

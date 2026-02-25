@@ -2,13 +2,11 @@ package com.example.RankCat.controller.api;
 
 import com.example.RankCat.dto.api.InsightResponseDto;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,30 +15,28 @@ public class ShoppingInsightController {
     private final ShoppingInsightService insightService;
 
     @PostMapping("/insight/categories")
-    public ResponseEntity<?> categories(
-            @RequestBody Map<String,String> req){
-        Map<String,Object> result = insightService.getCategoryTrend(
-                req.get("startDate"),
-                req.get("endDate"),
-                req.get("timeUnit"),
-                req.get("categoryName"),
-                req.get("categoryCode")
-        );
+    public ResponseEntity<?> categories(@RequestBody Map<String, String> req) {
+        Map<String, Object> result =
+                insightService.getCategoryTrend(
+                        req.get("startDate"),
+                        req.get("endDate"),
+                        req.get("timeUnit"),
+                        req.get("categoryName"),
+                        req.get("categoryCode"));
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/insight/keywords")
-    public ResponseEntity<?> keywords(
-            @RequestBody Map<String,Object> req){
+    public ResponseEntity<?> keywords(@RequestBody Map<String, Object> req) {
         @SuppressWarnings("unchecked")
         List<String> kws = (List<String>) req.get("keywords");
-        Map<String,Object> result = insightService.getKeywordTrend(
-                (String) req.get("startDate"),
-                (String) req.get("endDate"),
-                (String) req.get("timeUnit"),
-                (String) req.get("categoryCode"),
-                kws
-        );
+        Map<String, Object> result =
+                insightService.getKeywordTrend(
+                        (String) req.get("startDate"),
+                        (String) req.get("endDate"),
+                        (String) req.get("timeUnit"),
+                        (String) req.get("categoryCode"),
+                        kws);
         return ResponseEntity.ok(result);
     }
 
@@ -71,5 +67,4 @@ public class ShoppingInsightController {
         // 데이터가 있으면 200 OK 응답과 함께 데이터 전송
         return ResponseEntity.ok(result);
     }
-
 }

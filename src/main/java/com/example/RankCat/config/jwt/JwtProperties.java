@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix="jwt")
+@ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
     private String issuer;
-    private String secretKey;// YAML 의 secret-key 가 바인딩
+    private String secretKey; // YAML 의 secret-key 가 바인딩
 }
-

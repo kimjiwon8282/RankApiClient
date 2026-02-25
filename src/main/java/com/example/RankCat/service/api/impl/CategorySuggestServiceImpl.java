@@ -5,11 +5,10 @@ import com.example.RankCat.dto.api.CategorySuggestResponse;
 import com.example.RankCat.model.ShopSearchTrendResult;
 import com.example.RankCat.repository.ShopSearchTrendResultRepository;
 import com.example.RankCat.service.api.interfaces.CategorySuggestService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +31,11 @@ public class CategorySuggestServiceImpl implements CategorySuggestService {
         List<Map<String, Object>> items = Optional.ofNullable(doc.getItems()).orElse(List.of());
 
         // 1) rank=1 우선
-        Map<String, Object> rank1 = items.stream()
-                .filter(m -> Objects.equals(asInt(m.get("rank")), 1))
-                .findFirst()
-                .orElse(null);
+        Map<String, Object> rank1 =
+                items.stream()
+                        .filter(m -> Objects.equals(asInt(m.get("rank")), 1))
+                        .findFirst()
+                        .orElse(null);
 
         if (rank1 != null) {
             CategoryPath cp = toCategoryPath(rank1);
@@ -49,21 +49,24 @@ public class CategorySuggestServiceImpl implements CategorySuggestService {
         }
 
         // 2) 상위 N(기본 10) 최빈 경로
-        List<Map<String, Object>> top = items.stream()
-                .sorted(Comparator.comparingInt(m -> asInt(m.get("rank"))))
-                .limit(Math.max(1, topN))
-                .collect(Collectors.toList());
+        List<Map<String, Object>> top =
+                items.stream()
+                        .sorted(Comparator.comparingInt(m -> asInt(m.get("rank"))))
+                        .limit(Math.max(1, topN))
+                        .collect(Collectors.toList());
 
-        Map<CategoryPath, Long> freq = top.stream()
-                .map(this::toCategoryPath)
-                .filter(this::isComplete)
-                .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+        Map<CategoryPath, Long> freq =
+                top.stream()
+                        .map(this::toCategoryPath)
+                        .filter(this::isComplete)
+                        .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
 
         if (!freq.isEmpty()) {
-            CategoryPath majority = freq.entrySet().stream()
-                    .max(Map.Entry.comparingByValue())
-                    .map(Map.Entry::getKey)
-                    .orElse(null);
+            CategoryPath majority =
+                    freq.entrySet().stream()
+                            .max(Map.Entry.comparingByValue())
+                            .map(Map.Entry::getKey)
+                            .orElse(null);
 
             return CategorySuggestResponse.builder()
                     .source("majority")
@@ -103,11 +106,11 @@ public class CategorySuggestServiceImpl implements CategorySuggestService {
     }
 
     private boolean isComplete(CategoryPath cp) {
-        return cp != null &&
-                nonEmpty(cp.getCategory1()) &&
-                nonEmpty(cp.getCategory2()) &&
-                nonEmpty(cp.getCategory3()) &&
-                nonEmpty(cp.getCategory4());
+        return cp != null
+                && nonEmpty(cp.getCategory1())
+                && nonEmpty(cp.getCategory2())
+                && nonEmpty(cp.getCategory3())
+                && nonEmpty(cp.getCategory4());
     }
 
     private boolean nonEmpty(String s) {

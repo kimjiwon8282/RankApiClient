@@ -1,13 +1,11 @@
 package com.example.RankCat.service.user;
 
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +39,7 @@ public class EmailAuthService {
     }
 
     /**
-     * 사용자가 입력한 인증코드를 검증
-     * - 저장된 코드와 일치하는지
-     * - 만료되지는 않았는지
+     * 사용자가 입력한 인증코드를 검증 - 저장된 코드와 일치하는지 - 만료되지는 않았는지
      *
      * @param email 이메일 주소
      * @param code 사용자가 입력한 인증코드
@@ -78,9 +74,7 @@ public class EmailAuthService {
         return String.valueOf(number);
     }
 
-    /**
-     * 인증코드와 만료시간을 함께 저장하기 위한 내부 클래스
-     */
+    /** 인증코드와 만료시간을 함께 저장하기 위한 내부 클래스 */
     private static class CodeEntry {
         final String code;
         final long expiryTime;

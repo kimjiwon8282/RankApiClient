@@ -15,6 +15,7 @@ public class MailService {
 
     /**
      * 인증코드 메일 발송
+     *
      * @param to 수신자 이메일
      * @param code 인증코드
      * @throws Exception 메일 전송 실패시

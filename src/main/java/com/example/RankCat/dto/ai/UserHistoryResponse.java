@@ -1,13 +1,12 @@
 package com.example.RankCat.dto.ai;
 
 import com.example.RankCat.model.UserHistory;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -15,8 +14,8 @@ import java.util.List;
 @Builder
 public class UserHistoryResponse {
 
-    private String nickname;                  // 사용자 닉네임 (최상단에 1번만 표시)
-    private List<HistoryDto> histories;       // 히스토리 목록
+    private String nickname; // 사용자 닉네임 (최상단에 1번만 표시)
+    private List<HistoryDto> histories; // 히스토리 목록
 
     @Getter
     @AllArgsConstructor

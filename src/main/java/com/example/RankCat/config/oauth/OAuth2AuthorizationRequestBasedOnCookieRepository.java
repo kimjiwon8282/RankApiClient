@@ -1,6 +1,5 @@
 package com.example.RankCat.config.oauth;
 
-
 import com.example.RankCat.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,11 +8,7 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.web.util.WebUtils;
 
-
-/**
- * OAuth2 인가 요청 정보를 HTTP 쿠키에 저장하고,
- * 다시 쿠키에서 꺼내오는 저장소 구현체
- */
+/** OAuth2 인가 요청 정보를 HTTP 쿠키에 저장하고, 다시 쿠키에서 꺼내오는 저장소 구현체 */
 public class OAuth2AuthorizationRequestBasedOnCookieRepository
         implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
@@ -23,22 +18,15 @@ public class OAuth2AuthorizationRequestBasedOnCookieRepository
     /** 쿠키 수명 (초 단위) */
     private static final int COOKIE_EXPIRE_SECONDS = 18000; // 5시간
 
-    /**
-     * Authorization 요청을 제거(remove)하면서,
-     * 실제로는 loadAuthorizationRequest를 호출해 쿠키에서 꺼냄
-     */
+    /** Authorization 요청을 제거(remove)하면서, 실제로는 loadAuthorizationRequest를 호출해 쿠키에서 꺼냄 */
     @Override
     public OAuth2AuthorizationRequest removeAuthorizationRequest(
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest request, HttpServletResponse response) {
         // 스프링 내부에서 인가 요청 사용 후 cleanup을 위해 호출됨
         return this.loadAuthorizationRequest(request);
     }
 
-    /**
-     * 현재 요청에 대응하는 OAuth2AuthorizationRequest를
-     * 쿠키에서 꺼내 역직렬화하여 반환
-     */
+    /** 현재 요청에 대응하는 OAuth2AuthorizationRequest를 쿠키에서 꺼내 역직렬화하여 반환 */
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
         // 요청 내 쿠키 중 지정된 이름의 쿠키를 찾음
@@ -47,10 +35,7 @@ public class OAuth2AuthorizationRequestBasedOnCookieRepository
         return CookieUtil.deserialize(cookie, OAuth2AuthorizationRequest.class);
     }
 
-    /**
-     * OAuth2AuthorizationRequest 객체를 쿠키에 저장
-     * (인가 요청 단계에서 AuthorizationRequestRedirectFilter가 호출)
-     */
+    /** OAuth2AuthorizationRequest 객체를 쿠키에 저장 (인가 요청 단계에서 AuthorizationRequestRedirectFilter가 호출) */
     @Override
     public void saveAuthorizationRequest(
             OAuth2AuthorizationRequest authorizationRequest,
@@ -66,16 +51,12 @@ public class OAuth2AuthorizationRequestBasedOnCookieRepository
                 response,
                 OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME,
                 CookieUtil.serialize(authorizationRequest),
-                COOKIE_EXPIRE_SECONDS
-        );
+                COOKIE_EXPIRE_SECONDS);
     }
 
-    /**
-     * 명시적으로 인가 요청 쿠키를 삭제
-     */
+    /** 명시적으로 인가 요청 쿠키를 삭제 */
     public void removeAuthorizationRequestCookies(
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest request, HttpServletResponse response) {
         CookieUtil.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
     }
 }

@@ -1,28 +1,28 @@
-//package com.example.RankCat;
+// package com.example.RankCat;
 //
-//import com.example.RankCat.service.api.interfaces.KeywordToolService;
-//import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
-//import com.fasterxml.jackson.core.type.TypeReference;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.boot.ApplicationRunner;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.core.annotation.Order;
-//import org.springframework.core.io.ClassPathResource;
-//import java.io.IOException;
-//import java.time.LocalDate;
-//import java.time.format.DateTimeFormatter;
-//import java.util.Arrays;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Objects;
+// import com.example.RankCat.service.api.interfaces.KeywordToolService;
+// import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
+// import com.fasterxml.jackson.core.type.TypeReference;
+// import com.fasterxml.jackson.databind.ObjectMapper;
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springframework.boot.ApplicationRunner;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.core.annotation.Order;
+// import org.springframework.core.io.ClassPathResource;
+// import java.io.IOException;
+// import java.time.LocalDate;
+// import java.time.format.DateTimeFormatter;
+// import java.util.Arrays;
+// import java.util.List;
+// import java.util.Map;
+// import java.util.Objects;
 //
-//@Configuration
-//@RequiredArgsConstructor
-//@Slf4j
-//public class ApiScheduled {
+// @Configuration
+// @RequiredArgsConstructor
+// @Slf4j
+// public class ApiScheduled {
 //    private final KeywordToolService keywordToolService;
 //    private final ShoppingInsightService shoppingInsightService;
 //    private final ObjectMapper objectMapper;
@@ -85,10 +85,12 @@
 //                String categoryCode = cat.get("카테고리번호");
 //
 //                log.info("인사이트 트렌드(월): {}", categoryName);
-//                shoppingInsightService.getCategoryTrend(monthStart, endDate, "month", categoryName, categoryCode);
+//                shoppingInsightService.getCategoryTrend(monthStart, endDate, "month",
+// categoryName, categoryCode);
 //
 //                log.info("인사이트 트렌드(주): {}", categoryName);
-//                shoppingInsightService.getCategoryTrend(weekStart, endDate, "week", categoryName, categoryCode);
+//                shoppingInsightService.getCategoryTrend(weekStart, endDate, "week", categoryName,
+// categoryCode);
 //            }
 //            log.info("쇼핑인사이트 트렌드 데이터 수집 완료");
 //        };
@@ -117,4 +119,4 @@
 //            log.info("쇼핑 검색 트렌드 데이터 수집 완료");
 //        };
 //    }
-//}
+// }

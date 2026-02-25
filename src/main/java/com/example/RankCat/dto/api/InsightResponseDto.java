@@ -1,10 +1,9 @@
 package com.example.RankCat.dto.api;
 
 import com.example.RankCat.model.ShoppingInsightCategoryResult;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.Map;
 
 @Getter
 public class InsightResponseDto {
@@ -12,7 +11,8 @@ public class InsightResponseDto {
     private final Map<String, Object> weeklyResponse;
 
     @Builder
-    public InsightResponseDto(Map<String, Object> monthlyResponse, Map<String, Object> weeklyResponse) {
+    public InsightResponseDto(
+            Map<String, Object> monthlyResponse, Map<String, Object> weeklyResponse) {
         this.monthlyResponse = monthlyResponse;
         this.weeklyResponse = weeklyResponse;
     }
