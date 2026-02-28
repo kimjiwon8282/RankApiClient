@@ -1,8 +1,9 @@
 package com.example.RankCat.controller.user;
 
 import com.example.RankCat.dto.user.AddUserRequest;
-import com.example.RankCat.service.user.EmailAuthService;
-import com.example.RankCat.service.user.UserService;
+import com.example.RankCat.service.user.impl.UserService;
+import com.example.RankCat.service.user.interfaces.EmailAuthService;
+import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +18,9 @@ public class SignupController {
     private final EmailAuthService emailAuthService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody AddUserRequest addUserRequest) {
-        try {
-            userService.save(addUserRequest);
-            return ResponseEntity.ok().body("회원가입이 완료되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("회원가입에 실패했습니다" + e.getMessage());
-        }
+    public ResponseEntity<?> signup(@Valid @RequestBody AddUserRequest addUserRequest) {
+        userService.save(addUserRequest);
+        return ResponseEntity.ok().body("회원가입이 완료되었습니다.");
     }
 
     // 2. 이메일 중복 확인
@@ -37,12 +34,10 @@ public class SignupController {
     // 2. 인증코드 발송
     @PostMapping("/api/user/send-auth-code")
     public ResponseEntity<?> sendAuthCode(@RequestParam String email) {
-        try {
-            emailAuthService.sendAuthCode(email);
-            return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("인증 메일 발송 실패: " + e.getMessage());
-        }
+        // 예외가 발생하면 EmailAuthService나 MailService에서
+        // BusinessException을 던지고 GlobalExceptionHandler가 알아서 처리합니다.
+        emailAuthService.sendAuthCode(email);
+        return ResponseEntity.ok().body("인증 메일이 발송되었습니다.");
     }
 
     // 3. 인증코드 검증
@@ -50,11 +45,7 @@ public class SignupController {
     public ResponseEntity<?> verifyAuthCode(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String code = request.get("code");
-        boolean verified = emailAuthService.verifyAuthCode(email, code);
-        if (verified) {
-            return ResponseEntity.ok().body("인증 성공!");
-        } else {
-            return ResponseEntity.badRequest().body("인증 코드가 일치하지 않거나 만료되었습니다.");
-        }
+        emailAuthService.verifyAuthCode(email, code);
+        return ResponseEntity.ok().body("인증 성공!");
     }
 }

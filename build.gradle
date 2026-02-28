@@ -72,6 +72,12 @@ dependencies {
 
 	//개발 시 잠깐 사용(타임리프 바로 반영 DevTools)
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// 입력값 검증 (Validation)
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// 스프링 시큐리티 테스트를 위한 라이브러리 (with(user) 등을 사용하기 위함)
+	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 // --- Spotless 설정 블록 ---
@@ -97,10 +103,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// 2. 테스트 완전히 비활성화 (중요)
-tasks.withType(Test) {
-	enabled = false
-}
+// 2. 테스트 완전히 비활성화
+//tasks.withType(Test) {
+//	enabled = false
+//}
 
 jar{
 	enabled=false

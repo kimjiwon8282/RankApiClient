@@ -1,16 +1,18 @@
 package com.example.RankCat.controller.api;
 
-import com.example.RankCat.dto.api.InsightResponseDto;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/naver/api")
+@Validated
 public class ShoppingInsightController {
     private final ShoppingInsightService insightService;
 
@@ -52,19 +54,8 @@ public class ShoppingInsightController {
     }
 
     @GetMapping("/category-trend")
-    public ResponseEntity<?> getCategoryTrend(@RequestParam String query) {
-        if (query == null || query.isBlank()) {
-            return ResponseEntity.badRequest().body("쿼리를 입력해주세요.");
-        }
-
-        InsightResponseDto result = insightService.getInsightByQuery(query);
-
-        if (result == null) {
-            // 조회된 데이터가 없을 경우 404 Not Found 응답
-            return ResponseEntity.notFound().build();
-        }
-
-        // 데이터가 있으면 200 OK 응답과 함께 데이터 전송
-        return ResponseEntity.ok(result);
+    public ResponseEntity<?> getCategoryTrend(
+            @RequestParam @NotBlank(message = "쿼리를 입력해주세요.") String query) {
+        return ResponseEntity.ok(insightService.getInsightByQuery(query));
     }
 }

@@ -1,5 +1,7 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.common.exception.ErrorCode;
 import com.example.RankCat.dto.api.InsightResponseDto;
 import com.example.RankCat.model.ShopSearchTrendResult;
 import com.example.RankCat.model.ShoppingInsightCategoryResult;
@@ -43,12 +45,16 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
         body.put("ages", List.of());
 
         // POST 호출
-        Map<String, Object> response =
-                shoppingInsightRestTemplate.postForObject(
-                        "/v1/datalab/shopping/categories", // URI 템플릿
-                        new HttpEntity<>(body), // 요청 엔티티(헤더+바디)
-                        Map.class // 응답 바디를 매핑할 타입
-                        );
+        Map<String, Object> response;
+        try {
+            // ✅ 외부 API 호출 구간 보호
+            response =
+                    shoppingInsightRestTemplate.postForObject(
+                            "/v1/datalab/shopping/categories", new HttpEntity<>(body), Map.class);
+        } catch (Exception e) {
+            log.error("Naver API 호출 실패 (getCategoryTrend): {}", e.getMessage());
+            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
+        }
         log.info("categoryName={},쇼핑인사이트categoryapi 저장 완료", categoryName);
 
         // 기존 데이터 조회 또는 신규 생성
@@ -103,11 +109,18 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
         body.put("gender", "");
         body.put("ages", List.of());
 
-        Map<String, Object> response =
-                shoppingInsightRestTemplate.postForObject(
-                        "/v1/datalab/shopping/category/keywords",
-                        new HttpEntity<>(body),
-                        Map.class);
+        Map<String, Object> response;
+        try {
+            // ✅ 외부 API 호출 구간 보호
+            response =
+                    shoppingInsightRestTemplate.postForObject(
+                            "/v1/datalab/shopping/category/keywords",
+                            new HttpEntity<>(body),
+                            Map.class);
+        } catch (Exception e) {
+            log.error("Naver API 호출 실패 (getKeywordTrend): {}", e.getMessage());
+            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
+        }
         ShoppingInsightKeywordResult result = new ShoppingInsightKeywordResult();
         List<String> sortedKs = new ArrayList<>(keywords);
         Collections.sort(sortedKs);
@@ -193,8 +206,14 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
         uriVars.put("display", Math.min(display, 100)); // 안전: 최대 100
         uriVars.put("start", start);
 
-        Map<String, Object> resp =
-                shoppingInsightRestTemplate.getForObject(url, Map.class, uriVars);
+        Map<String, Object> resp;
+        try {
+            // ✅ 외부 API 호출 구간 보호
+            resp = shoppingInsightRestTemplate.getForObject(url, Map.class, uriVars);
+        } catch (Exception e) {
+            log.error("Naver API 호출 실패 (fetchShopPage): {}", e.getMessage());
+            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
+        }
         if (resp == null) {
             resp = new HashMap<>();
             resp.put("items", List.of());
@@ -205,16 +224,11 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
 
     @Override
     public InsightResponseDto getInsightByQuery(String query) {
-        // 1. 쿼리(검색어)를 categoryName으로 간주하고 DB에서 직접 조회합니다.
-        Optional<ShoppingInsightCategoryResult> insightOpt =
-                categoryRepository.findByCategoryName(query);
+        ShoppingInsightCategoryResult insight =
+                categoryRepository
+                        .findByCategoryName(query)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.DATA_NOT_FOUND));
 
-        if (insightOpt.isEmpty()) {
-            log.warn("카테고리명 '{}'에 대한 쇼핑 인사이트 데이터가 없습니다.", query);
-            return null;
-        }
-
-        // 2. 조회된 데이터를 DTO로 변환하여 반환합니다.
-        return InsightResponseDto.fromEntity(insightOpt.get());
+        return InsightResponseDto.fromEntity(insight);
     }
 }

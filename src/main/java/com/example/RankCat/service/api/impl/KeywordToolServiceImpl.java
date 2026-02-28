@@ -1,12 +1,13 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.common.exception.ErrorCode;
 import com.example.RankCat.dto.api.KeywordRecommendResponse;
 import com.example.RankCat.model.SearchAdKeywordResult;
 import com.example.RankCat.repository.SearchAdKeywordRepository;
 import com.example.RankCat.service.api.interfaces.KeywordToolService;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -29,15 +30,17 @@ public class KeywordToolServiceImpl implements KeywordToolService {
         String path =
                 "/keywordstool?hintKeywords={hint}&showDetail=1"; // base url은 RestTemplate에 이미 설정.
         // 경로만 작성
-        Map<String, Object> resp =
-                naverRestTemplate // RestTemplate로 GET요청 전송
-                        .exchange(
-                                path,
-                                HttpMethod.GET,
-                                null,
-                                Map.class,
-                                hint) // Map.class -> json전체를 Map<>으로 파싱함
-                        .getBody();
+        Map<String, Object> resp;
+        try {
+            // 외부 API 호출 구간을 try-catch로 보호
+            resp =
+                    naverRestTemplate
+                            .exchange(path, HttpMethod.GET, null, Map.class, hint)
+                            .getBody();
+        } catch (Exception e) {
+            log.error("Naver API 호출 실패: {}", e.getMessage());
+            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR); // 500 에러 던지기
+        }
 
         List<Map<String, Object>> keywordList =
                 (List<Map<String, Object>>) resp.getOrDefault("keywordList", List.of());
@@ -71,9 +74,11 @@ public class KeywordToolServiceImpl implements KeywordToolService {
     }
 
     @Override
-    public Optional<SearchAdKeywordResult> getKeywordAnalysis(String query) {
+    public SearchAdKeywordResult getKeywordAnalysis(String query) {
         log.info("DB에서 키워드 분석 데이터 조회: query={}", query);
         // Repository의 findById를 사용해 DB에서 데이터를 찾아 Optional로 반환합니다.
-        return keywordRepository.findById(query);
+        return keywordRepository
+                .findById(query)
+                .orElseThrow(() -> new BusinessException(ErrorCode.DATA_NOT_FOUND)); // ✅ 404 에러 던지기
     }
 }

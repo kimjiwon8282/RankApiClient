@@ -1,5 +1,8 @@
-package com.example.RankCat.service.user;
+package com.example.RankCat.service.user.impl;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.common.exception.ErrorCode;
+import com.example.RankCat.service.user.interfaces.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
@@ -9,8 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MailService {
-
+public class SmtpMailServiceImpl implements MailService {
     private final JavaMailSender mailSender;
 
     /**
@@ -20,6 +22,7 @@ public class MailService {
      * @param code 인증코드
      * @throws Exception 메일 전송 실패시
      */
+    @Override
     public void sendAuthCodeMail(String to, String code) {
         String subject = "[RankCat] 이메일 인증코드 안내";
         String text = String.format("안녕하세요!\n요청하신 인증코드는 [%s] 입니다.\n5분 이내에 입력해 주세요.", code);
@@ -36,7 +39,7 @@ public class MailService {
         } catch (Exception e) {
             log.error("이메일 발송 실패: to={}, code={}, message={}", to, code, e.getMessage(), e);
             // 예: 서비스에서 실패로 인식할 경우, 런타임 예외를 던지거나, 커스텀 예외로 감싸서 던지세요.
-            throw new RuntimeException("이메일 발송에 실패했습니다.", e);
+            throw new BusinessException(ErrorCode.MAIL_SEND_FAILED);
         }
     }
 }

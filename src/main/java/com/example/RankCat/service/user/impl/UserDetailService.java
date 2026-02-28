@@ -1,5 +1,7 @@
-package com.example.RankCat.service.user;
+package com.example.RankCat.service.user.impl;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.common.exception.ErrorCode;
 import com.example.RankCat.model.User;
 import com.example.RankCat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,6 @@ public class UserDetailService
     public User loadUserByUsername(String email) {
         return userRepository
                 .findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException(email + " 해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 }

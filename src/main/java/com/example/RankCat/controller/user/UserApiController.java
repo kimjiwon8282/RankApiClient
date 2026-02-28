@@ -3,7 +3,7 @@ package com.example.RankCat.controller.user;
 import com.example.RankCat.config.jwt.TokenProvider;
 import com.example.RankCat.dto.user.UserInfoResponse;
 import com.example.RankCat.model.User;
-import com.example.RankCat.service.user.UserService;
+import com.example.RankCat.service.user.impl.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

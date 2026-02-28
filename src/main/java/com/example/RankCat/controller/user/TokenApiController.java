@@ -1,7 +1,7 @@
 package com.example.RankCat.controller.user;
 
 import com.example.RankCat.dto.user.CreateAccessTokenResponse;
-import com.example.RankCat.service.user.TokenService;
+import com.example.RankCat.service.user.impl.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

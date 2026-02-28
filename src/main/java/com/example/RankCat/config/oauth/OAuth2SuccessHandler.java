@@ -4,7 +4,7 @@ import com.example.RankCat.config.jwt.TokenProvider;
 import com.example.RankCat.model.RefreshToken;
 import com.example.RankCat.model.User;
 import com.example.RankCat.repository.RefreshTokenRepository;
-import com.example.RankCat.service.user.UserService;
+import com.example.RankCat.service.user.impl.UserService;
 import com.example.RankCat.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

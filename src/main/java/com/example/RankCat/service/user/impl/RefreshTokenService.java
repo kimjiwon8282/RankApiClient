@@ -1,5 +1,7 @@
-package com.example.RankCat.service.user;
+package com.example.RankCat.service.user.impl;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.common.exception.ErrorCode;
 import com.example.RankCat.model.RefreshToken;
 import com.example.RankCat.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,6 @@ public class RefreshTokenService {
     public RefreshToken findByRefreshToken(String refreshToken) {
         return refreshTokenRepository
                 .findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("unexpected refresh token"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
     }
 }

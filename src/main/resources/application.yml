@@ -57,6 +57,7 @@ spring:
 
   jwt:
     issuer: ${JWT_ISSUER}
+
     secret-key: ${JWT_SECRET_KEY}
 
 FASTAPI_URL: ${FASTAPI_URL}

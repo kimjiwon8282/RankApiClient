@@ -3,7 +3,7 @@ package com.example.RankCat.config.oauth;
 import com.example.RankCat.config.jwt.TokenAuthenticationFilter;
 import com.example.RankCat.config.jwt.TokenProvider;
 import com.example.RankCat.repository.RefreshTokenRepository;
-import com.example.RankCat.service.user.UserService;
+import com.example.RankCat.service.user.impl.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

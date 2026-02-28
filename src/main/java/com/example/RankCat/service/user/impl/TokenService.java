@@ -1,5 +1,7 @@
-package com.example.RankCat.service.user;
+package com.example.RankCat.service.user.impl;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.common.exception.ErrorCode;
 import com.example.RankCat.config.jwt.TokenProvider;
 import com.example.RankCat.model.User;
 import java.time.Duration;
@@ -15,7 +17,7 @@ public class TokenService {
 
     public String createNewAccessToken(String refreshToken) {
         if (!tokenProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("Invalid refresh token");
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
         Long userId =
                 Long.valueOf(refreshTokenService.findByRefreshToken(refreshToken).getUserId());
