@@ -4,10 +4,13 @@ import com.example.RankCat.config.jwt.TokenAuthenticationFilter;
 import com.example.RankCat.config.jwt.TokenProvider;
 import com.example.RankCat.repository.RefreshTokenRepository;
 import com.example.RankCat.service.user.impl.UserService;
+import com.example.RankCat.util.CookieUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,12 +22,16 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @RequiredArgsConstructor
 public class WebOAuthSecurityConfig {
+    @Value("${cors.allowed-origins}")
+    private List<String> allowedOrigins;
 
     // --- 의존성 주입 --------------------------------------------------------------
     /** Spring Boot가 자동 생성해 주는 OAuth2 클라이언트 등록 저장소 */
@@ -42,8 +49,13 @@ public class WebOAuthSecurityConfig {
     /** 유저 조회 및 기타 비즈니스 로직을 수행하는 서비스 */
     private final UserService userService;
 
+    // CookieUtil 주입
+    private final CookieUtil cookieUtil;
+
     // 로그아웃 핸들러
     private final TokenLogoutHandler tokenLogoutHandler;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     // --- 정적 리소스 및 H2 콘솔 제외 ------------------------------------------------
 
@@ -68,6 +80,7 @@ public class WebOAuthSecurityConfig {
         http
                 // 1) 토큰 기반 인증을 사용하므로 기본 세션·폼로그인·CSRF 비활성화
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
 
@@ -75,10 +88,17 @@ public class WebOAuthSecurityConfig {
                 .logout(
                         logout ->
                                 logout.logoutUrl("/logout") // 로그아웃 처리 엔드포인트
-                                        .logoutSuccessUrl("/login") // 로그아웃 후 리다이렉트할 URL
                                         .addLogoutHandler(tokenLogoutHandler)
+                                        .logoutSuccessHandler(
+                                                (request, response, authentication) -> {
+                                                    response.setStatus(HttpServletResponse.SC_OK);
+                                                    response.setCharacterEncoding("UTF-8");
+                                                    response.setContentType("application/json");
+                                                    response.getWriter()
+                                                            .write(
+                                                                    "{\"message\": \"Logout successful\"}");
+                                                })
                                         .deleteCookies("refresh_token") // HTTP 쿠키에 저장된 리프레시 토큰 삭제
-                                        .invalidateHttpSession(true) // (만약 세션이 남아 있다면) 세션 무효화
                                         .permitAll() // 로그아웃 엔드포인트는 누구나 호출 가능
                         )
 
@@ -104,20 +124,15 @@ public class WebOAuthSecurityConfig {
                                                 "/api/user/**",
                                                 "/api/login",
                                                 "/naver/api/**",
-                                                "/api/categories/suggest")
+                                                "/api/categories/suggest",
+                                                "/api/token")
                                         .permitAll()
 
-                                        // – 토큰 재발급 엔드포인트 (공개)
-                                        .requestMatchers("/api/token")
-                                        .permitAll()
-
-                                        // – API 호출은 JWT 인증 필수
-                                        .requestMatchers("/api/**")
-                                        .authenticated()
-                                        .requestMatchers("/ai/save")
-                                        .authenticated() // 여기에 추가합니다.
-                                        .requestMatchers("/ai/histories")
-                                        .authenticated() // 여기에 추가합니다.
+                                        // --- 고도화: .authenticated() 대신 hasAnyRole 적용 ---
+                                        // 스프링 시큐리티가 내부적으로 ROLE_ 접두사를 붙여 검사하므로 "USER", "ADMIN"만
+                                        // 작성합니다.
+                                        .requestMatchers("/api/**", "/ai/save", "/ai/histories")
+                                        .hasAnyRole("USER", "ADMIN") // "USER" 권한을 추가합니다!
 
                                         // – 뷰 템플릿(게시글 목록·상세·작성)은 공개
                                         .anyRequest()
@@ -146,9 +161,10 @@ public class WebOAuthSecurityConfig {
                 // 7) API 인증 실패 시 401 Unauthorized 반환
                 .exceptionHandling(
                         ex ->
-                                ex.defaultAuthenticationEntryPointFor(
-                                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                        request -> request.getRequestURI().startsWith("/api/")));
+                                ex.authenticationEntryPoint(
+                                                jwtAuthenticationEntryPoint) // 401 에러 처리
+                                        .accessDeniedHandler(jwtAccessDeniedHandler) // 403 에러 처리
+                        );
 
         return http.build();
     }
@@ -159,6 +175,27 @@ public class WebOAuthSecurityConfig {
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter(tokenProvider);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // 1) 허용할 출처 (프론트엔드 주소)
+        configuration.setAllowedOrigins(allowedOrigins);
+        // 2) 허용할 HTTP 메서드 (GET, POST 등 모든 요청 허용)
+        configuration.addAllowedMethod("*");
+
+        // 3) 허용할 헤더 (인증 토큰 등을 실어 보낼 수 있게 모든 헤더 허용)
+        configuration.addAllowedHeader("*");
+
+        // 4) 중요: 쿠키/인증 정보를 포함한 요청을 허용할 것인가?
+        // 우리는 리프레시 토큰을 쿠키로 주고받으므로 반드시 true여야 합니다.
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 위 설정을 적용
+        return source;
     }
 
     /**
@@ -181,14 +218,15 @@ public class WebOAuthSecurityConfig {
                 tokenProvider,
                 refreshTokenRepository,
                 oAuth2AuthorizationRequestBasedOnCookieRepository(),
-                userService);
+                userService,
+                cookieUtil);
     }
 
     /** OAuth2 인가 요청 정보를 쿠키에 보관하는 저장소 빈 등록 */
     @Bean
     public OAuth2AuthorizationRequestBasedOnCookieRepository
             oAuth2AuthorizationRequestBasedOnCookieRepository() {
-        return new OAuth2AuthorizationRequestBasedOnCookieRepository();
+        return new OAuth2AuthorizationRequestBasedOnCookieRepository(cookieUtil);
     }
 
     @Bean

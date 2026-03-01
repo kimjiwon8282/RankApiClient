@@ -1,5 +1,6 @@
 package com.example.RankCat.config.jwt;
 
+import com.example.RankCat.model.Role;
 import com.example.RankCat.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
@@ -31,12 +32,6 @@ public class TokenProvider {
      * @return 생성된 JWT 문자열
      */
     public String generateToken(User user, Duration duration) {
-        log.info("JWT issuer: {}", jwtProperties.getIssuer());
-        log.info(
-                "JWT secretKey length: {}",
-                jwtProperties.getSecretKey() == null
-                        ? "null"
-                        : jwtProperties.getSecretKey().length());
         Date now = new Date(); // 현재 시각
         Date expiry = new Date(now.getTime() + duration.toMillis()); // 만료 시각 = 현재 + duration(밀리초)
         return makeToken(expiry, user);
@@ -65,6 +60,7 @@ public class TokenProvider {
                 .setSubject(user.getEmail())
                 // 추가 클레임으로 사용자 ID 저장
                 .claim("id", user.getId())
+                .claim("role", user.getRole().getKey())
                 // HS256 알고리즘, secretKey로 서명
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact();
@@ -99,9 +95,12 @@ public class TokenProvider {
         // 1) 클레임(페이로드) 조회
         Claims claims = getClaims(token);
 
-        // 2) 권한(ROLE_USER) 설정 — 여기선 모든 토큰에 단일 ROLE_USER 부여
+        // 2) 권한(ROLE_USER) 설정
+        String roleKey = claims.get("role", String.class);
+        if (roleKey == null) roleKey = Role.USER.getKey(); // 방어 로직
+
         Set<SimpleGrantedAuthority> authorities =
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+                Collections.singleton(new SimpleGrantedAuthority(roleKey));
 
         // 3) Spring Security User 객체 생성
         org.springframework.security.core.userdetails.User principal =
@@ -138,5 +137,14 @@ public class TokenProvider {
                 .setSigningKey(jwtProperties.getSecretKey()) // 비밀키로 서명 검증 후 페이로드 반환
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public Date getExpiration(String token) {
+        return getClaims(token).getExpiration();
+    }
+
+    /** 만료 시각을 직접 지정하여 토큰을 생성하는 메서드 (RTR용) */
+    public String generateTokenWithExpiry(User user, Date expiry) {
+        return makeToken(expiry, user);
     }
 }

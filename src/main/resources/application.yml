@@ -55,9 +55,16 @@ spring:
       mail.smtp.ssl.trust: smtp.naver.com
     default-encoding: UTF-8
 
-  jwt:
-    issuer: ${JWT_ISSUER}
+  profiles:
+    active: local # 기본값을 local로 설정하여 개발 편의성 증대
+    include: secret # 만약 비밀 키값을 별도 파일로 뺀다면 사용
 
-    secret-key: ${JWT_SECRET_KEY}
+jwt:
+  issuer: ${JWT_ISSUER}
+  secret-key: ${JWT_SECRET_KEY}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
 
 FASTAPI_URL: ${FASTAPI_URL}

@@ -4,32 +4,53 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
 
+@Component
 public class CookieUtil {
-    public static void addCookie(
-            HttpServletResponse response, String name, String value, int maxAge) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+
+    @Value("${cookie.same-site}")
+    private String sameSite;
+
+    @Value("${cookie.secure}")
+    private boolean secure;
+
+    // 1. 기본 쿠키 추가 (HttpOnly = true)
+    public void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+        addCookie(response, name, value, maxAge, true);
     }
 
-    public static void deleteCookie(
+    // 2. HttpOnly 여부를 제어할 수 있는 쿠키 추가
+    public void addCookie(
+            HttpServletResponse response, String name, String value, int maxAge, boolean httpOnly) {
+        ResponseCookie cookie =
+                ResponseCookie.from(name, value)
+                        .path("/")
+                        .maxAge(maxAge)
+                        .httpOnly(httpOnly)
+                        .secure(secure) // yml 설정에 따라 local은 false, prod는 true
+                        .sameSite(sameSite) // yml 설정에 따라 local은 Lax, prod는 None
+                        .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    // 3. 쿠키 삭제 (ResponseCookie 방식으로 통일)
+    public void deleteCookie(
             HttpServletRequest request, HttpServletResponse response, String name) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return;
-        }
-        for (Cookie cookie : cookies) {
-            if (name.equals(cookie.getName())) {
-                cookie.setValue("");
-                cookie.setPath("/");
-                cookie.setMaxAge(0);
-                response.addCookie(cookie);
-            }
-        }
+        ResponseCookie cookie =
+                ResponseCookie.from(name, "")
+                        .path("/")
+                        .maxAge(0)
+                        .secure(secure)
+                        .sameSite(sameSite)
+                        .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     /**
@@ -52,8 +73,12 @@ public class CookieUtil {
      * @return 역직렬화된 객체
      */
     public static <T> T deserialize(Cookie cookie, Class<T> cls) {
-        // 쿠키의 문자열을 디코딩 → SerializationUtils 로 객체 복원 → 원하는 타입으로 캐스팅
-        return cls.cast(
-                SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
+        if (cookie == null || cookie.getValue() == null || cookie.getValue().isEmpty()) {
+            return null;
+        }
+
+        // 2. 값이 있을 때만 디코딩 및 역직렬화 수행
+        byte[] decodedBytes = Base64.getUrlDecoder().decode(cookie.getValue());
+        return cls.cast(SerializationUtils.deserialize(decodedBytes));
     }
 }

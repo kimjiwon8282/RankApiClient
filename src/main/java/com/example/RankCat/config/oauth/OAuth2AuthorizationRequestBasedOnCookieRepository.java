@@ -4,11 +4,13 @@ import com.example.RankCat.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.web.util.WebUtils;
 
 /** OAuth2 인가 요청 정보를 HTTP 쿠키에 저장하고, 다시 쿠키에서 꺼내오는 저장소 구현체 */
+@RequiredArgsConstructor
 public class OAuth2AuthorizationRequestBasedOnCookieRepository
         implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
@@ -17,6 +19,8 @@ public class OAuth2AuthorizationRequestBasedOnCookieRepository
 
     /** 쿠키 수명 (초 단위) */
     private static final int COOKIE_EXPIRE_SECONDS = 18000; // 5시간
+
+    private final CookieUtil cookieUtil;
 
     /** Authorization 요청을 제거(remove)하면서, 실제로는 loadAuthorizationRequest를 호출해 쿠키에서 꺼냄 */
     @Override
@@ -46,17 +50,17 @@ public class OAuth2AuthorizationRequestBasedOnCookieRepository
             removeAuthorizationRequestCookies(request, response);
             return;
         }
-        // 인가 요청 객체를 바이트 배열로 직렬화 후 Base64로 인코딩하여 쿠키 저장
-        CookieUtil.addCookie(
+        // 주입받은 cookieUtil 인스턴스의 메서드 호출
+        cookieUtil.addCookie(
                 response,
                 OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME,
-                CookieUtil.serialize(authorizationRequest),
+                CookieUtil.serialize(authorizationRequest), // static 메서드 호출
                 COOKIE_EXPIRE_SECONDS);
     }
 
     /** 명시적으로 인가 요청 쿠키를 삭제 */
     public void removeAuthorizationRequestCookies(
             HttpServletRequest request, HttpServletResponse response) {
-        CookieUtil.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
+        cookieUtil.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
     }
 }

@@ -10,3 +10,10 @@ spring:
       ddl-auto: update
     show-sql: false
     database-platform: org.hibernate.dialect.MySQLDialect
+
+cookie:
+  same-site: None
+  secure: true
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}

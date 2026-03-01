@@ -16,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RequiredArgsConstructor
 @Component
@@ -24,6 +23,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     /** 쿠키에 저장할 리프레시 토큰 이름 */
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+
+    /** 프론트엔드 전달용 임시 액세스 토큰 쿠키 이름 */
+    public static final String ACCESS_TOKEN_COOKIE_NAME = "temp_access_token";
 
     /** 리프레시 토큰 유효 기간 (3일) */
     public static final Duration REFRESH_TOKEN_DURATION = Duration.ofDays(3);
@@ -35,11 +37,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public static final String REDIRECT_PATH = "/home";
 
     // --- 생성자 주입 컴포넌트 ---
-    private final TokenProvider tokenProvider; // (직접작성) JWT 생성·검증
-    private final RefreshTokenRepository refreshTokenRepository; // (직접작성) 리프레시 토큰 저장소
-    private final OAuth2AuthorizationRequestBasedOnCookieRepository
-            authorizationRequestRepository; // (직접작성) 쿠키 기반 인가 요청 저장소
-    private final UserService userService; // (직접작성) 사용자 조회/비즈니스 로직
+    private final TokenProvider tokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
+    private final UserService userService;
+    private final CookieUtil cookieUtil;
 
     /**
      * 로그인 성공 시 호출되는 메인 로직
@@ -55,7 +57,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 1) OAuth2User (소셜 유저 정보)를 추출
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        // 👉 [여기부터 email 추출 방식을 변경]
         String email;
         if (oAuth2User.getAttributes().containsKey("response")) {
             Map<String, Object> responseMap =
@@ -73,15 +74,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         saveRefreshToken(user.getId(), refreshToken);
         addRefreshTokenToCookie(request, response, refreshToken);
 
-        // 4) Access Token 생성 → Redirect URL에 쿼리파라미터로 추가
+        // 4) Access Token: URL 노출 대신 '임시 쿠키'에 담아서 전달 (HttpOnly = false)            String
+        // accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
         String accessToken = tokenProvider.generateToken(user, ACCESS_TOKEN_DURATION);
-        String targetUrl = getTargetUrl(accessToken);
-
+        int accessTokenMaxAge = 60;
+        // 2. 주입받은 cookieUtil 인스턴스 메서드 호출
+        cookieUtil.addCookie(
+                response, ACCESS_TOKEN_COOKIE_NAME, accessToken, accessTokenMaxAge, false);
         // 5) 임시 인증 데이터 (쿠키, 세션 등) 정리
         clearAuthenticationAttributes(request, response);
 
-        // 6) 최종 리다이렉트 실행 (/articles?token={accessToken})
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        // 6) 최종 리다이렉트 실행
+        getRedirectStrategy().sendRedirect(request, response, REDIRECT_PATH);
     }
 
     /** 리프레시 토큰을 DB에 저장하거나 업데이트 */
@@ -100,9 +104,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private void addRefreshTokenToCookie(
             HttpServletRequest request, HttpServletResponse response, String refreshToken) {
         int maxAge = (int) REFRESH_TOKEN_DURATION.toSeconds();
-        // 기존 쿠키 삭제 후 새 쿠키 등록
-        CookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);
-        CookieUtil.addCookie(response, REFRESH_TOKEN_COOKIE_NAME, refreshToken, maxAge);
+
+        // 3. 주입받은 cookieUtil 인스턴스 메서드 호출
+        cookieUtil.deleteCookie(request, response, REFRESH_TOKEN_COOKIE_NAME);
+        cookieUtil.addCookie(response, REFRESH_TOKEN_COOKIE_NAME, refreshToken, maxAge);
     }
 
     /** 스프링 인증 관련 임시 속성 및 쿠키(인가 요청 정보) 정리 */
@@ -112,13 +117,5 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         super.clearAuthenticationAttributes(request);
         // 쿠키 기반 인가 요청 정보 삭제
         authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
-    }
-
-    /** 액세스 토큰을 쿼리 파라미터에 담아 Redirect URL 생성 */
-    private String getTargetUrl(String token) {
-        return UriComponentsBuilder.fromUriString(REDIRECT_PATH)
-                .queryParam("token", token) // 자바스크립트에서 읽어 localStorage에 저장하기
-                .build()
-                .toUriString();
     }
 }

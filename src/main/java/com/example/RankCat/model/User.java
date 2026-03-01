@@ -30,11 +30,16 @@ public class User implements UserDetails { // Spring Security 인증용 인터�
     @Column(name = "nickname")
     private String nickname; // 화면에 표시할 별명
 
+    @Enumerated(EnumType.STRING) // DB에 문자열(USER, ADMIN)로 저장
+    @Column(name = "role", nullable = false)
+    private Role role = Role.USER; // 기본값은 일반 사용자로 설정
+
     @Builder
-    public User(String email, String password, String nickname) {
+    public User(String email, String password, String nickname, Role role) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.role = (role != null) ? role : Role.USER;
     }
 
     /**
@@ -44,7 +49,7 @@ public class User implements UserDetails { // Spring Security 인증용 인터�
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("user"));
+        return List.of(new SimpleGrantedAuthority(role.getKey()));
     }
 
     /** 로그인 시 Spring Security가 내부적으로 호출하는 사용자 식별값 */
