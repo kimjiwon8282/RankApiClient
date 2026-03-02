@@ -1,4 +1,4 @@
-package com.example.RankCat.config.oauth;
+package com.example.RankCat.config.auth;
 
 import com.example.RankCat.model.User;
 import com.example.RankCat.repository.UserRepository;

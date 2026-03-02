@@ -1,4 +1,4 @@
-package com.example.RankCat.config.oauth;
+package com.example.RankCat.config.auth;
 
 import com.example.RankCat.config.jwt.TokenProvider;
 import com.example.RankCat.model.RefreshToken;

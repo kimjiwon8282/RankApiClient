@@ -1,4 +1,4 @@
-package com.example.RankCat.config.oauth;
+package com.example.RankCat.config.auth;
 
 import com.example.RankCat.util.CookieUtil;
 import jakarta.servlet.http.Cookie;

@@ -1,4 +1,4 @@
-package com.example.RankCat.config.oauth;
+package com.example.RankCat.config.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.RankCat.config.oauth.WebOAuthSecurityConfig;
+import com.example.RankCat.config.auth.WebOAuthSecurityConfig;
 import com.example.RankCat.service.ai.interfaces.UserHistoryService;
 import com.example.RankCat.service.user.impl.UserService;
 import org.junit.jupiter.api.DisplayName;

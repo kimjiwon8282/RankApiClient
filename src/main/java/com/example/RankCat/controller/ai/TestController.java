@@ -2,12 +2,14 @@ package com.example.RankCat.controller.ai;
 
 import com.example.RankCat.dto.ai.HealthResponse;
 import com.example.RankCat.service.ai.interfaces.PredictionService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Hidden
 @RestController
 @RequiredArgsConstructor
 public class TestController {

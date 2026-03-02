@@ -1,4 +1,4 @@
-package com.example.RankCat.service.user.impl;
+package com.example.RankCat.config.auth;
 
 import com.example.RankCat.common.exception.BusinessException;
 import com.example.RankCat.common.exception.ErrorCode;

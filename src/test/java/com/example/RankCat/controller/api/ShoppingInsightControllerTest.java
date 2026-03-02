@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.RankCat.common.exception.BusinessException;
 import com.example.RankCat.common.exception.ErrorCode;
-import com.example.RankCat.config.oauth.WebOAuthSecurityConfig;
+import com.example.RankCat.config.auth.WebOAuthSecurityConfig;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

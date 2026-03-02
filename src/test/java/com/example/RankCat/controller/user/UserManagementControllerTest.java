@@ -10,8 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.example.RankCat.common.exception.BusinessException;
 import com.example.RankCat.common.exception.ErrorCode;
+import com.example.RankCat.config.auth.WebOAuthSecurityConfig;
 import com.example.RankCat.config.jwt.TokenProvider;
-import com.example.RankCat.config.oauth.WebOAuthSecurityConfig;
 import com.example.RankCat.dto.user.AddUserRequest;
 import com.example.RankCat.repository.RefreshTokenRepository;
 import com.example.RankCat.service.user.impl.TokenService;
