@@ -16,6 +16,8 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A001", "유효하지 않은 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "A002", "리프레시 토큰을 찾을 수 없습니다."),
     INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "A003", "인증 코드가 일치하지 않거나 만료되었습니다."),
+    MISSING_AUTH_COOKIE(
+            HttpStatus.UNAUTHORIZED, "A004", "필수 인증 쿠키가 누락되었습니다."), // 👈 프론트엔드 401 유도를 위해 새로 추가!
 
     // Mail (M)
     MAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "M001", "이메일 발송에 실패했습니다."),

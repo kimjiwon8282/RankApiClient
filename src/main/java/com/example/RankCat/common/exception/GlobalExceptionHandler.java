@@ -33,9 +33,7 @@ public class GlobalExceptionHandler {
     }
 
     // DB에 없는 사용자 이메일로 로그인 시도 시 발생하는 예외 처리
-    @ExceptionHandler(
-            InternalAuthenticationServiceException
-                    .class)
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
     protected ResponseEntity<ErrorResponse> handleInternalAuthenticationServiceException(
             InternalAuthenticationServiceException e) {
         log.warn("Login Failure (User Not Found): {}", e.getMessage());
@@ -48,8 +46,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleMissingRequestCookieException(
             MissingRequestCookieException e) {
         log.warn("Missing Request Cookie: {}", e.getMessage());
-        ErrorResponse response = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE); // C001
-        return new ResponseEntity<>(response, ErrorCode.INVALID_INPUT_VALUE.getStatus());
+        ErrorResponse response = ErrorResponse.of(ErrorCode.MISSING_AUTH_COOKIE);
+        return new ResponseEntity<>(response, ErrorCode.MISSING_AUTH_COOKIE.getStatus());
     }
 
     // 예상치 못한 그 외의 모든 런타임 에러(NullPointerException 등)를 잡는 Fallback
