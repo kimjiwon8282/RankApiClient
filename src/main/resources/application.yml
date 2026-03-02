@@ -68,3 +68,8 @@ logging:
     org.springframework.security: DEBUG
 
 FASTAPI_URL: ${FASTAPI_URL}
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha # 태그(그룹)를 이름(알파벳/숫자) 순으로 정렬
+    operations-sorter: alpha # 태그 안의 API 엔드포인트들도 알파벳/http메서드 순으로 정렬
