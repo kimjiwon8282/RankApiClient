@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class OAuth2UserCustomService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -49,7 +51,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
                         .map(e -> e.update(nickname))
                         .orElse(User.builder().email(email).nickname(nickname).build());
 
-        userRepository.save(user);
+        userRepository.save(user); // 기존 유저면 JPA가 알아서 무시(변경감지 작동), 신규 유저면 INSERT 쿼리
 
         return oAuth2User;
     }

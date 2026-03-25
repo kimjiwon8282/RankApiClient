@@ -15,7 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity // JPA 엔티티 지정: users 테이블과 매핑
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // 파라미터 없는 기본 생성자를 protected로 제한
 @Table(name = "users") // 매핑할 테이블 이름 지정
-public class User implements UserDetails { // Spring Security 인증용 인터페이스 구현
+public class User extends BaseTimeEntity implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 방식
     @Column(name = "id", updatable = false)

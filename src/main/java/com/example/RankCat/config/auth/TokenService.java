@@ -1,4 +1,4 @@
-package com.example.RankCat.service.user.impl;
+package com.example.RankCat.config.auth;
 
 import com.example.RankCat.common.exception.BusinessException;
 import com.example.RankCat.common.exception.ErrorCode;
@@ -18,7 +18,6 @@ public class TokenService {
     private final TokenProvider tokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserService userService;
 
     // 액세스 토큰은 발급 시점부터 2시간
     public static final Duration ACCESS_TOKEN_DURATION = Duration.ofHours(2);
@@ -31,8 +30,8 @@ public class TokenService {
         }
 
         // 2. DB에서 토큰 정보 및 유저 조회
-        RefreshToken refreshTokenObj = refreshTokenService.findByRefreshToken(refreshToken);
-        User user = userService.findById(refreshTokenObj.getUserId());
+        RefreshToken refreshTokenObj = refreshTokenService.findWithUserByRefreshToken(refreshToken);
+        User user = refreshTokenObj.getUser();
 
         // 3. 수명 승계 전략: 기존 토큰의 만료 시각을 추출
         Date oldExpiry = tokenProvider.getExpiration(refreshToken);

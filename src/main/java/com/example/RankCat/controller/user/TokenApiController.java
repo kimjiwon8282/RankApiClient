@@ -1,7 +1,7 @@
 package com.example.RankCat.controller.user;
 
+import com.example.RankCat.config.auth.TokenService;
 import com.example.RankCat.dto.user.CreateAccessTokenResponse;
-import com.example.RankCat.service.user.impl.TokenService;
 import com.example.RankCat.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

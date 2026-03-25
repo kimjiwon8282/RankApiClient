@@ -1,4 +1,4 @@
-package com.example.RankCat.service.user.impl;
+package com.example.RankCat.config.auth;
 
 import com.example.RankCat.common.exception.BusinessException;
 import com.example.RankCat.common.exception.ErrorCode;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public RefreshToken findByRefreshToken(String refreshToken) {
+    public RefreshToken findWithUserByRefreshToken(String refreshToken) {
         return refreshTokenRepository
-                .findByRefreshToken(refreshToken)
+                .findWithUserByRefreshToken(refreshToken)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
     }
 }

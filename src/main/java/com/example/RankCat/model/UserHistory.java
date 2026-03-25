@@ -1,51 +1,75 @@
 package com.example.RankCat.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class UserHistory {
+@Table(
+        name = "user_history",
+        indexes = {
+            @Index(name = "idx_user_query_created", columnList = "user_id, query, createdAt DESC"),
+            @Index(name = "idx_user_created", columnList = "user_id, createdAt DESC"),
+            @Index(
+                    name = "idx_user_product_created",
+                    columnList = "user_id, productId, createdAt ASC")
+        })
+public class UserHistory extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(name = "id", updatable = false)
+    private Long id;
 
-    // 소유 사용자
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @CreationTimestamp
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+    // --- 필수 입력 필드 (nullable = false) ---
 
-    // 요청 필드
+    @Column(nullable = false, length = 500)
     private String query;
+
+    @Column(nullable = false, length = 1000)
     private String title;
-    private Integer lprice;
-    private Integer hprice;
-    private String mallName;
-    private String brand;
-    private String maker;
-    private String productId;
 
-    /** FastAPI 요청에서 문자열이므로 String 으로 저장 */
-    private String productType;
-
+    @Column(nullable = false)
     private String category1;
+
+    @Column(nullable = false)
     private String category2;
+
+    @Column(nullable = false)
     private String category3;
+
+    @Column(nullable = false)
     private String category4;
 
-    // 응답 필드
+    @Column(nullable = false)
     private Double predRank;
+
+    @Column(nullable = false)
     private Double predRankClipped;
+
+    // --- 선택 입력 필드 (NULL 허용) ---
+
+    @Column private Integer lprice;
+
+    @Column private Integer hprice;
+
+    @Column private String mallName;
+
+    @Column private String brand;
+
+    @Column private String maker;
+
+    @Column private String productId;
+
+    @Column private String productType;
 
     @Builder
     public UserHistory(

@@ -1,4 +1,4 @@
-package com.example.RankCat.service.user.impl;
+package com.example.RankCat.config.auth;
 
 import com.example.RankCat.config.jwt.TokenProvider;
 import com.example.RankCat.dto.user.LoginRequest;
@@ -35,17 +35,18 @@ public class AuthService {
         String refreshToken = tokenProvider.generateToken(user, Duration.ofDays(3));
 
         // 3. 리프레시 토큰 저장 및 업데이트
-        updateRefreshToken(user.getId(), refreshToken);
+        updateRefreshToken(user, refreshToken);
 
         return new LoginResponse(accessToken, refreshToken);
     }
 
-    private void updateRefreshToken(Long userId, String refreshToken) {
+    private void updateRefreshToken(User user, String refreshToken) {
         RefreshToken tokenEntity =
                 refreshTokenRepository
-                        .findByUserId(userId)
+                        .findByUser(user)
                         .map(rt -> rt.update(refreshToken))
-                        .orElse(new RefreshToken(userId, refreshToken));
+                        .orElse(new RefreshToken(user, refreshToken));
+
         refreshTokenRepository.save(tokenEntity);
     }
 
