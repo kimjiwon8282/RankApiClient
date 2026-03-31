@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class RefreshTokenService {
+
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenHashService refreshTokenHashService;
 
     public RefreshToken findWithUserByRefreshToken(String refreshToken) {
+        String hashedRefreshToken = refreshTokenHashService.hash(refreshToken);
+
         return refreshTokenRepository
-                .findWithUserByRefreshToken(refreshToken)
+                .findWithUserByRefreshToken(hashedRefreshToken)
                 .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
     }
 }

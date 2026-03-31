@@ -42,6 +42,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final OAuth2AuthorizationRequestBasedOnCookieRepository authorizationRequestRepository;
     private final UserService userService;
     private final CookieUtil cookieUtil;
+    private final RefreshTokenHashService refreshTokenHashService;
 
     /**
      * 로그인 성공 시 호출되는 메인 로직
@@ -90,13 +91,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     /** 리프레시 토큰을 DB에 저장하거나 업데이트 */
     private void saveRefreshToken(User user, String newRefreshToken) {
-        // 기존 토큰이 있으면 업데이트, 없으면 새로 생성
+        String refreshTokenHash = refreshTokenHashService.hash(newRefreshToken);
+
         RefreshToken refreshToken =
                 refreshTokenRepository
                         .findByUser(user)
-                        .map(entity -> entity.update(newRefreshToken))
-                        .orElse(new RefreshToken(user, newRefreshToken));
-        // 저장 (insert or update)
+                        .map(entity -> entity.update(refreshTokenHash))
+                        .orElse(new RefreshToken(user, refreshTokenHash));
+
         refreshTokenRepository.save(refreshToken);
     }
 

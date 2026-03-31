@@ -13,19 +13,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService { // 회원가입 서비스
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public Long save(AddUserRequest dto) { // 애플리케이션 내부 회원가입 로직
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return userRepository
                 .save(
                         User.builder()
                                 .email(dto.getEmail())
                                 .nickname(dto.getNickname())
-                                .password(encoder.encode(dto.getPassword()))
+                                .password(bCryptPasswordEncoder.encode(dto.getPassword()))
                                 .build())
                 .getId();
     }

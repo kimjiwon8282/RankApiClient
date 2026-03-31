@@ -17,22 +17,22 @@ import org.springframework.web.util.WebUtils;
 public class TokenLogoutHandler implements LogoutHandler {
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenHashService refreshTokenHashService;
 
     @Override
     public void logout(
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication) {
-        // 1. 쿠키에서 리프레시 토큰 찾기
-        // (OAuth2SuccessHandler 등에서 사용한 쿠키 이름과 동일해야 함)
+
         Cookie cookie = WebUtils.getCookie(request, "refresh_token");
 
         if (cookie != null) {
             String refreshToken = cookie.getValue();
+            String hashedRefreshToken = refreshTokenHashService.hash(refreshToken);
 
-            // 2. DB에서 해당 리프레시 토큰 삭제
             refreshTokenRepository
-                    .findByRefreshToken(refreshToken)
+                    .findByRefreshToken(hashedRefreshToken)
                     .ifPresent(
                             token -> {
                                 refreshTokenRepository.delete(token);

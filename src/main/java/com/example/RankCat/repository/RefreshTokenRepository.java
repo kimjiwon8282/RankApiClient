@@ -18,6 +18,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByUser(User user);
 
     // [토큰 재발급용] 새 액세스 토큰을 만들기 위해 User 정보가 무조건 필요할 때 (FETCH JOIN으로 한 방 쿼리)
-    @Query("SELECT r FROM RefreshToken r JOIN FETCH r.user WHERE r.refreshToken = :refreshToken")
-    Optional<RefreshToken> findWithUserByRefreshToken(String refreshToken);
+    @Query(
+            "SELECT r FROM RefreshToken r JOIN FETCH r.user WHERE r.refreshToken = :refreshTokenHash")
+    Optional<RefreshToken> findWithUserByRefreshToken(String refreshTokenHash);
 }

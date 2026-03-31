@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
@@ -56,6 +55,7 @@ public class WebOAuthSecurityConfig {
     private final TokenLogoutHandler tokenLogoutHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final RefreshTokenHashService refreshTokenHashService;
 
     // --- 정적 리소스 및 H2 콘솔 제외 ------------------------------------------------
 
@@ -219,7 +219,8 @@ public class WebOAuthSecurityConfig {
                 refreshTokenRepository,
                 oAuth2AuthorizationRequestBasedOnCookieRepository(),
                 userService,
-                cookieUtil);
+                cookieUtil,
+                refreshTokenHashService);
     }
 
     /** OAuth2 인가 요청 정보를 쿠키에 보관하는 저장소 빈 등록 */
@@ -239,11 +240,5 @@ public class WebOAuthSecurityConfig {
                         customizer.additionalParameters(
                                 params -> params.put("prompt", "select_account")));
         return defaultResolver;
-    }
-
-    /** 비밀번호 암호화를 위한 BCryptPasswordEncoder 빈 등록 */
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
