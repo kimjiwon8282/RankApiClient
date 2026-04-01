@@ -13,9 +13,13 @@ import lombok.NoArgsConstructor;
         name = "user_history",
         indexes = {
             @Index(
-                    name = "idx_user_query_created", //특정 사용자의 특정 검색어, 최신순 ㅈ어렬
+                    name = "idx_user_query_created", // 특정 사용자의 특정 검색어, 최신순 정렬
                     columnList = "user_id, query, createdAt DESC, id DESC"),
-            @Index(name = "idx_user_created", columnList = "user_id, createdAt DESC, id DESC"), //-> /ai/histories 조회용(최신순 정렬, 커서는 createdAt, id를 사용)
+            @Index(
+                    name = "idx_user_created",
+                    columnList =
+                            "user_id, createdAt DESC, id DESC"), // -> /ai/histories 조회용(최신순 정렬, 커서는
+            // createdAt, id를 사용)
             @Index(
                     name = "idx_user_product_created",
                     columnList = "user_id, productId, createdAt ASC")

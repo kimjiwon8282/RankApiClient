@@ -1,10 +1,9 @@
 package com.example.RankCat.model;
 
-import jakarta.persistence.Id;
 import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "shopping_insight_keywords")
@@ -13,13 +12,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ShoppingInsightKeywordResult {
     @Id private String id;
 
-    private String categoryCode; // 카테고리 코드
-    private List<String> keywords; // 요청한 키워드 리스트
-
-    private String startDate; // 요청 시작일
-    private String endDate; // 요청 종료일
-    private String timeUnit; // 시간 단위 (daily, weekly 등)
-
-    private Map<String, Object> response; // API 호출 결과 전체
-    private long callAt; // 저장 시각 (timestamp)
+    private String categoryCode;
+    private List<String> keywords;
+    private String startDate;
+    private String endDate;
+    private String timeUnit;
+    private ShoppingInsightTrendResponse response;
+    private long callAt;
+    private long expiresAt;
+    private String source;
+    private String lastCollectedJob;
 }

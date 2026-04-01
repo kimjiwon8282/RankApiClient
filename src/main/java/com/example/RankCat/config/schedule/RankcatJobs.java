@@ -1,5 +1,8 @@
 package com.example.RankCat.config.schedule;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.model.CollectorTriggerType;
+import com.example.RankCat.service.api.interfaces.CollectorJobService;
 import com.example.RankCat.service.api.interfaces.KeywordToolService;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -7,7 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,11 +30,11 @@ public class RankcatJobs {
 
     private final KeywordToolService keywordToolService;
     private final ShoppingInsightService shoppingInsightService;
+    private final CollectorJobService collectorJobService;
     private final ObjectMapper objectMapper;
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    // --- 공통: 카테고리 로딩 + 이름 추출 ---
     private List<Map<String, String>> loadCategories() throws IOException {
         var resource = new ClassPathResource("data/categoryDataVegetable.json");
         if (!resource.exists()) {
@@ -46,81 +51,203 @@ public class RankcatJobs {
         return (combined == null || combined.isBlank()) ? null : combined.trim();
     }
 
-    // 1) 관련 키워드 수집 — 매일 09:30 KST
+    private List<String> extractDistinctKeywords(List<Map<String, String>> categories) {
+        return categories.stream()
+                .map(this::extractCategoryName)
+                .filter(Objects::nonNull)
+                .flatMap(n -> Arrays.stream(n.split("/")))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(
+                        java.util.stream.Collectors.collectingAndThen(
+                                java.util.stream.Collectors.toCollection(LinkedHashSet::new),
+                                ArrayList::new));
+    }
+
+    private List<CategoryTarget> extractCategoryTargets(List<Map<String, String>> categories) {
+        List<CategoryTarget> targets = new ArrayList<>();
+        for (Map<String, String> cat : categories) {
+            String name = extractCategoryName(cat);
+            String code = cat.get("카테고리번호");
+            if (name == null || name.isBlank() || code == null || code.isBlank()) {
+                continue;
+            }
+            targets.add(new CategoryTarget(name, code));
+        }
+        return targets;
+    }
+
     @Scheduled(cron = "0 30 9 * * *", zone = "Asia/Seoul")
     @SchedulerLock(
-            name = "rankcat.keyword.collect",
+            name = CollectorJobNames.RELATED_KEYWORD_COLLECT,
             lockAtMostFor = "PT30M",
             lockAtLeastFor = "PT1M")
     public void collectRelatedKeywordsDaily() throws IOException {
-        log.info("[JOB] collectRelatedKeywordsDaily: start");
-        loadCategories().stream()
-                .map(this::extractCategoryName)
-                .filter(Objects::nonNull)
-                .flatMap(n -> Arrays.stream(n.split("/")))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .forEach(
-                        k -> {
-                            try {
-                                keywordToolService.getRelatedKeywords(k);
-                            } catch (Exception e) {
-                                log.warn("keywordTool fail: {} -> {}", k, e.getMessage());
-                            }
-                        });
-        log.info("[JOB] collectRelatedKeywordsDaily: done");
+        long startedAt = System.currentTimeMillis();
+        int totalCount = 0;
+        int successCount = 0;
+        List<String> failedTargets = new ArrayList<>();
+        String errorCode = null;
+        String errorMessage = null;
+
+        try {
+            log.info("[JOB] collectRelatedKeywordsDaily: start");
+            List<String> keywords = extractDistinctKeywords(loadCategories());
+            totalCount = keywords.size();
+
+            for (String keyword : keywords) {
+                try {
+                    keywordToolService.collectRelatedKeywords(keyword);
+                    successCount++;
+                } catch (Exception e) {
+                    failedTargets.add(keyword);
+                    errorCode = resolveErrorCode(e);
+                    errorMessage = e.getMessage();
+                    log.warn("keywordTool fail: {} -> {}", keyword, e.getMessage());
+                }
+            }
+            log.info("[JOB] collectRelatedKeywordsDaily: done");
+        } catch (Exception e) {
+            errorCode = resolveErrorCode(e);
+            errorMessage = e.getMessage();
+            throw e;
+        } finally {
+            collectorJobService.recordExecution(
+                    CollectorJobNames.RELATED_KEYWORD_COLLECT,
+                    CollectorTriggerType.SCHEDULED,
+                    startedAt,
+                    totalCount,
+                    successCount,
+                    failedTargets,
+                    errorCode,
+                    errorMessage);
+        }
     }
 
-    // 2) 쇼핑인사이트(월/주) 카테고리 트렌드 — 매일 09:45 KST
     @Scheduled(cron = "0 45 9 * * *", zone = "Asia/Seoul")
     @SchedulerLock(
-            name = "rankcat.insight.category",
+            name = CollectorJobNames.CATEGORY_TREND_COLLECT,
             lockAtMostFor = "PT45M",
             lockAtLeastFor = "PT2M")
     public void collectCategoryTrendDaily() throws IOException {
-        log.info("[JOB] collectCategoryTrendDaily: start");
-        var categories = loadCategories();
-        LocalDate today = LocalDate.now();
-        String endDate = today.format(FMT);
-        String weekStart = today.minusWeeks(12).with(java.time.DayOfWeek.MONDAY).format(FMT);
-        String monthStart = today.minusYears(1).format(FMT);
+        long startedAt = System.currentTimeMillis();
+        int totalCount = 0;
+        int successCount = 0;
+        List<String> failedTargets = new ArrayList<>();
+        String errorCode = null;
+        String errorMessage = null;
 
-        for (var cat : categories) {
-            String name = extractCategoryName(cat);
-            if (name == null || name.isBlank()) continue;
-            String code = cat.get("카테고리번호");
-            try {
-                shoppingInsightService.getCategoryTrend(monthStart, endDate, "month", name, code);
-                shoppingInsightService.getCategoryTrend(weekStart, endDate, "week", name, code);
-            } catch (Exception e) {
-                log.warn("insight fail: {}({}) -> {}", name, code, e.getMessage());
+        try {
+            log.info("[JOB] collectCategoryTrendDaily: start");
+            List<CategoryTarget> targets = extractCategoryTargets(loadCategories());
+            totalCount = targets.size() * 2;
+            LocalDate today = LocalDate.now();
+            String endDate = today.format(FMT);
+            String weekStart = today.minusWeeks(12).with(java.time.DayOfWeek.MONDAY).format(FMT);
+            String monthStart = today.minusYears(1).format(FMT);
+
+            for (CategoryTarget target : targets) {
+                try {
+                    shoppingInsightService.collectCategoryTrend(
+                            monthStart, endDate, "month", target.name(), target.code());
+                    successCount++;
+                } catch (Exception e) {
+                    failedTargets.add(target.name() + "(month)");
+                    errorCode = resolveErrorCode(e);
+                    errorMessage = e.getMessage();
+                    log.warn(
+                            "insight monthly fail: {}({}) -> {}",
+                            target.name(),
+                            target.code(),
+                            e.getMessage());
+                }
+
+                try {
+                    shoppingInsightService.collectCategoryTrend(
+                            weekStart, endDate, "week", target.name(), target.code());
+                    successCount++;
+                } catch (Exception e) {
+                    failedTargets.add(target.name() + "(week)");
+                    errorCode = resolveErrorCode(e);
+                    errorMessage = e.getMessage();
+                    log.warn(
+                            "insight weekly fail: {}({}) -> {}",
+                            target.name(),
+                            target.code(),
+                            e.getMessage());
+                }
             }
+            log.info("[JOB] collectCategoryTrendDaily: done");
+        } catch (Exception e) {
+            errorCode = resolveErrorCode(e);
+            errorMessage = e.getMessage();
+            throw e;
+        } finally {
+            collectorJobService.recordExecution(
+                    CollectorJobNames.CATEGORY_TREND_COLLECT,
+                    CollectorTriggerType.SCHEDULED,
+                    startedAt,
+                    totalCount,
+                    successCount,
+                    failedTargets,
+                    errorCode,
+                    errorMessage);
         }
-        log.info("[JOB] collectCategoryTrendDaily: done");
     }
 
-    // 3) 네이버 쇼핑 검색 트렌드 — 매일 10:00 KST
     @Scheduled(cron = "0 00 10 * * *", zone = "Asia/Seoul")
     @SchedulerLock(
-            name = "rankcat.shop.search.trend",
+            name = CollectorJobNames.SHOP_SEARCH_TREND_COLLECT,
             lockAtMostFor = "PT45M",
             lockAtLeastFor = "PT2M")
     public void collectShopSearchTrendDaily() throws IOException {
-        log.info("[JOB] collectShopSearchTrendDaily: start");
-        loadCategories().stream()
-                .map(this::extractCategoryName)
-                .filter(Objects::nonNull)
-                .flatMap(n -> Arrays.stream(n.split("/")))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .forEach(
-                        q -> {
-                            try {
-                                shoppingInsightService.getShopSearchTrend(q);
-                            } catch (Exception e) {
-                                log.warn("shopTrend fail: {} -> {}", q, e.getMessage());
-                            }
-                        });
-        log.info("[JOB] collectShopSearchTrendDaily: done");
+        long startedAt = System.currentTimeMillis();
+        int totalCount = 0;
+        int successCount = 0;
+        List<String> failedTargets = new ArrayList<>();
+        String errorCode = null;
+        String errorMessage = null;
+
+        try {
+            log.info("[JOB] collectShopSearchTrendDaily: start");
+            List<String> queries = extractDistinctKeywords(loadCategories());
+            totalCount = queries.size();
+
+            for (String query : queries) {
+                try {
+                    shoppingInsightService.collectShopSearchTrend(query);
+                    successCount++;
+                } catch (Exception e) {
+                    failedTargets.add(query);
+                    errorCode = resolveErrorCode(e);
+                    errorMessage = e.getMessage();
+                    log.warn("shopTrend fail: {} -> {}", query, e.getMessage());
+                }
+            }
+            log.info("[JOB] collectShopSearchTrendDaily: done");
+        } catch (Exception e) {
+            errorCode = resolveErrorCode(e);
+            errorMessage = e.getMessage();
+            throw e;
+        } finally {
+            collectorJobService.recordExecution(
+                    CollectorJobNames.SHOP_SEARCH_TREND_COLLECT,
+                    CollectorTriggerType.SCHEDULED,
+                    startedAt,
+                    totalCount,
+                    successCount,
+                    failedTargets,
+                    errorCode,
+                    errorMessage);
+        }
     }
+
+    private String resolveErrorCode(Exception e) {
+        if (e instanceof BusinessException businessException) {
+            return businessException.getErrorCode().getCode();
+        }
+        return null;
+    }
+
+    private record CategoryTarget(String name, String code) {}
 }

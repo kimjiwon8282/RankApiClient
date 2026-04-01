@@ -16,8 +16,7 @@ public enum ErrorCode {
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "A001", "유효하지 않은 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "A002", "리프레시 토큰을 찾을 수 없습니다."),
     INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "A003", "인증 코드가 일치하지 않거나 만료되었습니다."),
-    MISSING_AUTH_COOKIE(
-            HttpStatus.UNAUTHORIZED, "A004", "필수 인증 쿠키가 누락되었습니다."), // 👈 프론트엔드 401 유도를 위해 새로 추가!
+    MISSING_AUTH_COOKIE(HttpStatus.UNAUTHORIZED, "A004", "필수 인증 쿠키가 누락되었습니다."),
 
     // Mail (M)
     MAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "M001", "이메일 발송에 실패했습니다."),
@@ -28,7 +27,11 @@ public enum ErrorCode {
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "C003", "요청하신 데이터를 찾을 수 없습니다."),
 
     // External API (E)
-    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E001", "외부 API 연동 중 문제가 발생했습니다.");
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "E001", "외부 API 연동 중 문제가 발생했습니다."),
+    EXTERNAL_API_UNAUTHORIZED(HttpStatus.BAD_GATEWAY, "E002", "외부 API 인증에 실패했습니다."),
+    EXTERNAL_API_TIMEOUT(HttpStatus.GATEWAY_TIMEOUT, "E003", "외부 API 응답이 지연되고 있습니다."),
+    EXTERNAL_API_CLIENT_ERROR(HttpStatus.BAD_GATEWAY, "E004", "외부 API 요청 처리 중 문제가 발생했습니다."),
+    EXTERNAL_API_SERVER_ERROR(HttpStatus.BAD_GATEWAY, "E005", "외부 API 서버 오류가 발생했습니다.");
 
     private final HttpStatus status;
     private final String code;

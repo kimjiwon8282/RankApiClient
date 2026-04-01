@@ -2,10 +2,14 @@ package com.example.RankCat.service.api.impl;
 
 import com.example.RankCat.dto.api.CategoryPath;
 import com.example.RankCat.dto.api.CategorySuggestResponse;
+import com.example.RankCat.model.ShopSearchTrendItem;
 import com.example.RankCat.model.ShopSearchTrendResult;
 import com.example.RankCat.repository.ShopSearchTrendResultRepository;
 import com.example.RankCat.service.api.interfaces.CategorySuggestService;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,14 +32,10 @@ public class CategorySuggestServiceImpl implements CategorySuggestService {
         }
 
         ShopSearchTrendResult doc = opt.get();
-        List<Map<String, Object>> items = Optional.ofNullable(doc.getItems()).orElse(List.of());
+        List<ShopSearchTrendItem> items = Optional.ofNullable(doc.getItems()).orElse(List.of());
 
-        // 1) rank=1 우선
-        Map<String, Object> rank1 =
-                items.stream()
-                        .filter(m -> Objects.equals(asInt(m.get("rank")), 1))
-                        .findFirst()
-                        .orElse(null);
+        ShopSearchTrendItem rank1 =
+                items.stream().filter(item -> rankOf(item) == 1).findFirst().orElse(null);
 
         if (rank1 != null) {
             CategoryPath cp = toCategoryPath(rank1);
@@ -48,10 +48,9 @@ public class CategorySuggestServiceImpl implements CategorySuggestService {
             }
         }
 
-        // 2) 상위 N(기본 10) 최빈 경로
-        List<Map<String, Object>> top =
+        List<ShopSearchTrendItem> top =
                 items.stream()
-                        .sorted(Comparator.comparingInt(m -> asInt(m.get("rank"))))
+                        .sorted(Comparator.comparingInt(this::rankOf))
                         .limit(Math.max(1, topN))
                         .collect(Collectors.toList());
 
@@ -75,7 +74,6 @@ public class CategorySuggestServiceImpl implements CategorySuggestService {
                     .build();
         }
 
-        // 3) 실패
         return CategorySuggestResponse.builder()
                 .source("none")
                 .callAt(doc.getCallAt())
@@ -83,26 +81,17 @@ public class CategorySuggestServiceImpl implements CategorySuggestService {
                 .build();
     }
 
-    private int asInt(Object o) {
-        if (o == null) return Integer.MAX_VALUE;
-        try {
-            return Integer.parseInt(String.valueOf(o));
-        } catch (Exception e) {
-            return Integer.MAX_VALUE;
-        }
+    private int rankOf(ShopSearchTrendItem item) {
+        return item.getRank() != null ? item.getRank() : Integer.MAX_VALUE;
     }
 
-    private CategoryPath toCategoryPath(Map<String, Object> m) {
+    private CategoryPath toCategoryPath(ShopSearchTrendItem item) {
         return CategoryPath.builder()
-                .category1(asStr(m.get("category1")))
-                .category2(asStr(m.get("category2")))
-                .category3(asStr(m.get("category3")))
-                .category4(asStr(m.get("category4")))
+                .category1(item.getCategory1())
+                .category2(item.getCategory2())
+                .category3(item.getCategory3())
+                .category4(item.getCategory4())
                 .build();
-    }
-
-    private String asStr(Object o) {
-        return o == null ? null : String.valueOf(o);
     }
 
     private boolean isComplete(CategoryPath cp) {

@@ -1,63 +1,50 @@
 package com.example.RankCat.service.api.impl;
 
+import com.example.RankCat.client.naver.NaverShopSearchClient;
+import com.example.RankCat.client.naver.NaverShoppingInsightClient;
 import com.example.RankCat.common.exception.BusinessException;
 import com.example.RankCat.common.exception.ErrorCode;
 import com.example.RankCat.dto.api.InsightResponseDto;
+import com.example.RankCat.dto.api.KeywordTrendResponseDto;
+import com.example.RankCat.dto.api.ShopSearchTrendResponseDto;
+import com.example.RankCat.model.ShopSearchTrendItem;
 import com.example.RankCat.model.ShopSearchTrendResult;
 import com.example.RankCat.model.ShoppingInsightCategoryResult;
 import com.example.RankCat.model.ShoppingInsightKeywordResult;
+import com.example.RankCat.model.ShoppingInsightTrendResponse;
 import com.example.RankCat.repository.ShopSearchTrendResultRepository;
 import com.example.RankCat.repository.ShoppingInsightCategoryRepository;
 import com.example.RankCat.repository.ShoppingInsightKeywordRepository;
 import com.example.RankCat.service.api.interfaces.ShoppingInsightService;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 public class ShoppingInsightServiceImpl implements ShoppingInsightService {
-    private final RestTemplate shoppingInsightRestTemplate;
+    private final NaverShoppingInsightClient shoppingInsightClient;
+    private final NaverShopSearchClient shopSearchClient;
     private final ShoppingInsightCategoryRepository categoryRepository;
     private final ShoppingInsightKeywordRepository keywordRepository;
     private final ShopSearchTrendResultRepository trendRepository;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> getCategoryTrend(
+    public void collectCategoryTrend(
             String startDate,
             String endDate,
             String timeUnit,
             String categoryName,
             String categoryCode) {
-        // 요청 바디 구성
-        Map<String, Object> body = new HashMap<>();
-        body.put("startDate", startDate);
-        body.put("endDate", endDate);
-        body.put("timeUnit", timeUnit);
-        body.put("category", List.of(Map.of("name", categoryName, "param", List.of(categoryCode))));
-        body.put("device", "");
-        body.put("gender", "");
-        body.put("ages", List.of());
+        ShoppingInsightTrendResponse response =
+                shoppingInsightClient.fetchCategoryTrend(
+                        startDate, endDate, timeUnit, categoryName, categoryCode);
 
-        // POST 호출
-        Map<String, Object> response;
-        try {
-            // ✅ 외부 API 호출 구간 보호
-            response =
-                    shoppingInsightRestTemplate.postForObject(
-                            "/v1/datalab/shopping/categories", new HttpEntity<>(body), Map.class);
-        } catch (Exception e) {
-            log.error("Naver API 호출 실패 (getCategoryTrend): {}", e.getMessage());
-            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
-        }
-        log.info("categoryName={},쇼핑인사이트categoryapi 저장 완료", categoryName);
-
-        // 기존 데이터 조회 또는 신규 생성
         ShoppingInsightCategoryResult result =
                 categoryRepository
                         .findById(categoryCode)
@@ -69,6 +56,7 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
                                     r.setCategoryName(categoryName);
                                     return r;
                                 });
+
         long now = System.currentTimeMillis();
         if ("month".equalsIgnoreCase(timeUnit)) {
             result.setMonthlyResponse(response);
@@ -82,99 +70,64 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
             result.setEndDate_w(endDate);
         }
 
-        // 저장
         categoryRepository.save(result);
-        return response;
+        log.info("categoryName={}, 쇼핑인사이트 category api 저장 완료", categoryName);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> getKeywordTrend(
+    public void collectKeywordTrend(
             String startDate,
             String endDate,
             String timeUnit,
             String categoryCode,
             List<String> keywords) {
-        // 키워드 리스트를 name/param 구조로 변환
-        List<Map<String, Object>> kwList =
-                keywords.stream().map(k -> Map.of("name", k, "param", List.of(k))).toList();
+        ShoppingInsightTrendResponse response =
+                shoppingInsightClient.fetchKeywordTrend(
+                        startDate, endDate, timeUnit, categoryCode, keywords);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("startDate", startDate);
-        body.put("endDate", endDate);
-        body.put("timeUnit", timeUnit);
-        body.put("category", categoryCode);
-        body.put("keyword", kwList);
-        body.put("device", "");
-        body.put("gender", "");
-        body.put("ages", List.of());
-
-        Map<String, Object> response;
-        try {
-            // ✅ 외부 API 호출 구간 보호
-            response =
-                    shoppingInsightRestTemplate.postForObject(
-                            "/v1/datalab/shopping/category/keywords",
-                            new HttpEntity<>(body),
-                            Map.class);
-        } catch (Exception e) {
-            log.error("Naver API 호출 실패 (getKeywordTrend): {}", e.getMessage());
-            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
-        }
         ShoppingInsightKeywordResult result = new ShoppingInsightKeywordResult();
-        List<String> sortedKs = new ArrayList<>(keywords);
-        Collections.sort(sortedKs);
-        String kwPart = String.join("_", sortedKs);
-        result.setId(categoryCode + "_" + kwPart);
+        List<String> sortedKeywords = new ArrayList<>(keywords);
+        Collections.sort(sortedKeywords);
+        result.setId(buildKeywordTrendId(categoryCode, sortedKeywords));
         result.setCategoryCode(categoryCode);
         result.setKeywords(keywords);
+        result.setStartDate(startDate);
+        result.setEndDate(endDate);
+        result.setTimeUnit(timeUnit);
         result.setResponse(response);
         result.setCallAt(System.currentTimeMillis());
 
         keywordRepository.save(result);
-        return response;
+        log.info("categoryCode={}, keywords={} 쇼핑인사이트 keyword api 저장 완료", categoryCode, keywords);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> getShopSearchTrend(String query) {
+    public void collectShopSearchTrend(String query) {
+        NaverShopSearchClient.NaverShopSearchResponse page1 =
+                shopSearchClient.search(query, 1, 100);
+        List<ShopSearchTrendItem> items1 = defaultItems(page1.getItems());
+        int total = page1.getTotal() > 0 ? page1.getTotal() : items1.size();
 
-        // 1) 1페이지(1~100)
-        Map<String, Object> resp1 = fetchShopPage(query, 1, 100);
-        List<Map<String, Object>> items1 =
-                (List<Map<String, Object>>) resp1.getOrDefault("items", List.of());
-        int total = ((Number) resp1.getOrDefault("total", items1.size())).intValue();
-
-        // 2) 2페이지(101~200) — total이 100 초과할 때만 호출(불필요 호출 방지)
-        List<Map<String, Object>> items2 = List.of();
+        List<ShopSearchTrendItem> items2 = List.of();
         if (total > 100) {
-            Map<String, Object> resp2 = fetchShopPage(query, 101, 100);
-            items2 = (List<Map<String, Object>>) resp2.getOrDefault("items", List.of());
+            NaverShopSearchClient.NaverShopSearchResponse page2 =
+                    shopSearchClient.search(query, 101, 100);
+            items2 = defaultItems(page2.getItems());
         }
 
-        // 3) 합치고 productId 중복 제거(LinkedHashMap으로 순서 유지)
-        Map<String, Map<String, Object>> uniq = new LinkedHashMap<>();
-        for (Map<String, Object> it : items1) {
-            String key = String.valueOf(it.get("productId")); // productId가 항상 온다고 가정
-            uniq.putIfAbsent(key, it);
-        }
-        for (Map<String, Object> it : items2) {
-            String key = String.valueOf(it.get("productId"));
-            uniq.putIfAbsent(key, it);
-        }
-        List<Map<String, Object>> merged = new ArrayList<>(uniq.values());
+        LinkedHashMap<String, ShopSearchTrendItem> uniqueItems = new LinkedHashMap<>();
+        addUniqueItems(uniqueItems, items1);
+        addUniqueItems(uniqueItems, items2);
 
-        // 4) 200개 초과시 컷(안전)
+        List<ShopSearchTrendItem> merged = new ArrayList<>(uniqueItems.values());
         if (merged.size() > 200) {
-            merged = merged.subList(0, 200);
+            merged = new ArrayList<>(merged.subList(0, 200));
         }
 
-        // 5) 최종 rank 재부여(1..N)
         for (int i = 0; i < merged.size(); i++) {
-            merged.get(i).put("rank", i + 1);
+            merged.get(i).setRank(i + 1);
         }
 
-        // 6) MongoDB 저장 (query를 PK로 덮어쓰기: 히스토리 보존하려면 PK를 query+timestamp로 바꾸세요)
         ShopSearchTrendResult doc = new ShopSearchTrendResult();
         doc.setId(query);
         doc.setItems(merged);
@@ -188,38 +141,6 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
                 items1.size(),
                 items2.size(),
                 merged.size());
-
-        // 7) 반환: 2페이지까지 합친 결과를 응답 형태로 구성
-        Map<String, Object> out = new HashMap<>(resp1);
-        out.put("display", merged.size());
-        out.put("start", 1);
-        out.put("items", merged);
-        return out;
-    }
-
-    /** 페이지 호출 헬퍼: display<=100, start는 1-based */
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> fetchShopPage(String query, int start, int display) {
-        String url = "/v1/search/shop?query={query}&display={display}&start={start}";
-        Map<String, Object> uriVars = new HashMap<>();
-        uriVars.put("query", query);
-        uriVars.put("display", Math.min(display, 100)); // 안전: 최대 100
-        uriVars.put("start", start);
-
-        Map<String, Object> resp;
-        try {
-            // ✅ 외부 API 호출 구간 보호
-            resp = shoppingInsightRestTemplate.getForObject(url, Map.class, uriVars);
-        } catch (Exception e) {
-            log.error("Naver API 호출 실패 (fetchShopPage): {}", e.getMessage());
-            throw new BusinessException(ErrorCode.EXTERNAL_API_ERROR);
-        }
-        if (resp == null) {
-            resp = new HashMap<>();
-            resp.put("items", List.of());
-            resp.put("total", 0);
-        }
-        return resp;
     }
 
     @Override
@@ -228,7 +149,68 @@ public class ShoppingInsightServiceImpl implements ShoppingInsightService {
                 categoryRepository
                         .findByCategoryName(query)
                         .orElseThrow(() -> new BusinessException(ErrorCode.DATA_NOT_FOUND));
-
         return InsightResponseDto.fromEntity(insight);
+    }
+
+    @Override
+    public KeywordTrendResponseDto getKeywordTrendSnapshot(
+            String categoryCode, List<String> keywords) {
+        List<String> sortedKeywords = new ArrayList<>(keywords);
+        Collections.sort(sortedKeywords);
+        String id = buildKeywordTrendId(categoryCode, sortedKeywords);
+        ShoppingInsightKeywordResult result =
+                keywordRepository
+                        .findById(id)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.DATA_NOT_FOUND));
+        return KeywordTrendResponseDto.fromEntity(result);
+    }
+
+    @Override
+    public ShopSearchTrendResponseDto getShopSearchTrendSnapshot(String query) {
+        ShopSearchTrendResult result =
+                trendRepository
+                        .findById(query)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.DATA_NOT_FOUND));
+        return ShopSearchTrendResponseDto.fromEntity(result);
+    }
+
+    private String buildKeywordTrendId(String categoryCode, List<String> sortedKeywords) {
+        return categoryCode + "_" + String.join("_", sortedKeywords);
+    }
+
+    private List<ShopSearchTrendItem> defaultItems(List<ShopSearchTrendItem> items) {
+        return items != null ? items : List.of();
+    }
+
+    private void addUniqueItems(
+            LinkedHashMap<String, ShopSearchTrendItem> uniqueItems,
+            List<ShopSearchTrendItem> sourceItems) {
+        for (ShopSearchTrendItem item : sourceItems) {
+            uniqueItems.putIfAbsent(resolveItemKey(item), item);
+        }
+    }
+
+    private String resolveItemKey(ShopSearchTrendItem item) {
+        String productId = trimToNull(item.getProductId());
+        if (productId != null) {
+            return productId;
+        }
+        return String.join(
+                "|",
+                defaultString(item.getTitle()),
+                defaultString(item.getMallName()),
+                defaultString(item.getLink()));
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private String defaultString(String value) {
+        return value == null ? "" : value;
     }
 }

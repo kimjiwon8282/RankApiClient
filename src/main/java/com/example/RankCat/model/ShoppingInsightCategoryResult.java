@@ -1,25 +1,30 @@
 package com.example.RankCat.model;
 
-import jakarta.persistence.Id;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "shopping_insight_categories")
 @Getter
 @Setter
 public class ShoppingInsightCategoryResult {
-    @Id private String id; // 카테고리 코드
+    @Id private String id;
 
     private String categoryName;
-    private Map<String, Object> monthlyResponse;
+    private ShoppingInsightTrendResponse monthlyResponse;
     private long monthlyCallAt;
-    private String startDate_m; // 요청 시작일
-    private String endDate_m; // 요청 종료일
+    private String startDate_m;
+    private String endDate_m;
+    private long monthlyExpiresAt;
+    private String monthlySource;
+    private String monthlyLastCollectedJob;
 
-    private Map<String, Object> weeklyResponse;
+    private ShoppingInsightTrendResponse weeklyResponse;
     private long weeklyCallAt;
-    private String startDate_w; // 요청 시작일
-    private String endDate_w; // 요청 종료일
+    private String startDate_w;
+    private String endDate_w;
+    private long weeklyExpiresAt;
+    private String weeklySource;
+    private String weeklyLastCollectedJob;
 }
