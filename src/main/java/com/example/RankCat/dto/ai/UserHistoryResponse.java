@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @Schema(description = "사용자 분석 이력 응답 객체")
 public class UserHistoryResponse {
-    @Schema(description = "사용자 닉네임 (화면 상단 노출용)", example = "지완개발자")
-    private String nickname; // 사용자 닉네임 (최상단에 1번만 표시)
+    @Schema(description = "사용자 닉네임 (화면 상단 노출용)", example = "지원개발자")
+    private String nickname;
 
     @Schema(description = "히스토리 목록")
-    private List<HistoryDto> histories; // 히스토리 목록
+    private List<HistoryDto> histories;
 
     @Getter
     @AllArgsConstructor
@@ -99,5 +99,29 @@ public class UserHistoryResponse {
                     .createdAt(entity.getCreatedAt())
                     .build();
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Schema(description = "키셋 페이지네이션 기반 분석 이력 응답")
+    public static class HistorySliceResponse {
+        @Schema(description = "현재 응답에 포함된 히스토리 목록")
+        private List<HistoryDto> histories;
+
+        @Schema(description = "다음 묶음 존재 여부", example = "true")
+        private boolean hasNext;
+
+        @Schema(
+                description = "다음 요청에 넘길 createdAt 커서. hasNext=false면 null입니다.",
+                example = "2026-03-30T12:34:56")
+        private LocalDateTime nextCursorCreatedAt;
+
+        @Schema(description = "다음 요청에 넘길 ID 커서. hasNext=false면 null입니다.", example = "120")
+        private Long nextCursorId;
+
+        @Schema(description = "요청 size", example = "20")
+        private int size;
     }
 }

@@ -12,8 +12,10 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "user_history",
         indexes = {
-            @Index(name = "idx_user_query_created", columnList = "user_id, query, createdAt DESC"),
-            @Index(name = "idx_user_created", columnList = "user_id, createdAt DESC"),
+            @Index(
+                    name = "idx_user_query_created", //특정 사용자의 특정 검색어, 최신순 ㅈ어렬
+                    columnList = "user_id, query, createdAt DESC, id DESC"),
+            @Index(name = "idx_user_created", columnList = "user_id, createdAt DESC, id DESC"), //-> /ai/histories 조회용(최신순 정렬, 커서는 createdAt, id를 사용)
             @Index(
                     name = "idx_user_product_created",
                     columnList = "user_id, productId, createdAt ASC")
@@ -28,8 +30,6 @@ public class UserHistory extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    // --- 필수 입력 필드 (nullable = false) ---
 
     @Column(nullable = false, length = 500)
     private String query;
@@ -54,8 +54,6 @@ public class UserHistory extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Double predRankClipped;
-
-    // --- 선택 입력 필드 (NULL 허용) ---
 
     @Column private Integer lprice;
 

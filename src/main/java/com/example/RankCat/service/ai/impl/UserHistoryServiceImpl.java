@@ -1,5 +1,7 @@
 package com.example.RankCat.service.ai.impl;
 
+import com.example.RankCat.common.exception.BusinessException;
+import com.example.RankCat.common.exception.ErrorCode;
 import com.example.RankCat.dto.ai.SaveHistoryRequest;
 import com.example.RankCat.dto.ai.UserHistoryResponse;
 import com.example.RankCat.model.User;
@@ -9,7 +11,7 @@ import com.example.RankCat.service.ai.interfaces.UserHistoryService;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,14 +50,15 @@ public class UserHistoryServiceImpl implements UserHistoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserHistoryResponse.HistoryDto> getUserHistoriesWithPaging(
-            User user, Pageable pageable) {
-        // [성능 테스트 포인트] 인덱스가 없을 때 데이터가 많아지면 Page 객체를 만들기 위한
-        // 내부적 'Count 쿼리'가 전체 테이블을 스캔하며 매우 느려집니다.
-        Page<UserHistory> histories =
-                userHistoryRepository.findByUserOrderByCreatedAtDesc(user, pageable);
+    public UserHistoryResponse.HistorySliceResponse getUserHistoriesWithCursor(
+            User user, LocalDateTime cursorCreatedAt, Long cursorId, int size) {
+        validateCursor(cursorCreatedAt, cursorId);
 
-        return histories.map(UserHistoryResponse.HistoryDto::fromEntity);
+        List<UserHistory> histories =
+                userHistoryRepository.findHistorySliceByUser(
+                        user, cursorCreatedAt, cursorId, PageRequest.of(0, size + 1));
+
+        return toSliceResponse(histories, size);
     }
 
     @Transactional(readOnly = true)
@@ -66,8 +69,6 @@ public class UserHistoryServiceImpl implements UserHistoryService {
             LocalDateTime start,
             LocalDateTime end,
             Pageable pageable) {
-        // 인덱스/파티셔닝 미적용 시: 테이블 전체를 풀스캔하며 user_id, productId와 기간을 대조합니다.
-        // List로 반환하지만, 내부적으로는 페이징 처리를 통해 힙 메모리 폭주를 방지합니다.
         return userHistoryRepository
                 .findByUserAndProductIdAndCreatedAtBetweenOrderByCreatedAtAsc(
                         user, productId, start, end, pageable)
@@ -78,11 +79,49 @@ public class UserHistoryServiceImpl implements UserHistoryService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<UserHistoryResponse.HistoryDto> searchHistoriesByQuery(
-            User user, String query, Pageable pageable) {
-        // 복합 인덱스 미적용 시: user_id와 query를 모두 비교하기 위해 상당한 I/O가 발생합니다.
-        return userHistoryRepository
-                .findByUserAndQuery(user, query, pageable)
-                .map(UserHistoryResponse.HistoryDto::fromEntity);
+    public UserHistoryResponse.HistorySliceResponse searchHistoriesByQuery(
+            User user, String query, LocalDateTime cursorCreatedAt, Long cursorId, int size) {
+        validateCursor(cursorCreatedAt, cursorId);
+
+        List<UserHistory> histories =
+                userHistoryRepository.findHistorySliceByUserAndQuery(
+                        user, query, cursorCreatedAt, cursorId, PageRequest.of(0, size + 1));
+
+        return toSliceResponse(histories, size);
+    }
+
+    private void validateCursor(LocalDateTime cursorCreatedAt, Long cursorId) {
+        boolean hasCreatedAt = cursorCreatedAt != null;
+        boolean hasId = cursorId != null;
+
+        if (hasCreatedAt != hasId) {
+            throw new BusinessException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    private UserHistoryResponse.HistorySliceResponse toSliceResponse(
+            List<UserHistory> histories, int size) {
+        boolean hasNext = histories.size() > size;
+        List<UserHistory> currentSlice = hasNext ? histories.subList(0, size) : histories;
+
+        LocalDateTime nextCursorCreatedAt = null;
+        Long nextCursorId = null;
+
+        if (hasNext && !currentSlice.isEmpty()) {
+            UserHistory lastHistory = currentSlice.get(currentSlice.size() - 1);
+            nextCursorCreatedAt = lastHistory.getCreatedAt();
+            nextCursorId = lastHistory.getId();
+        }
+
+        return UserHistoryResponse.HistorySliceResponse.builder()
+                .histories(
+                        currentSlice.stream()
+                                .map(UserHistoryResponse.HistoryDto::fromEntity)
+                                .toList())
+                .hasNext(hasNext)
+                .nextCursorCreatedAt(nextCursorCreatedAt)
+                .nextCursorId(nextCursorId)
+                .size(size)
+                .build();
     }
 }
