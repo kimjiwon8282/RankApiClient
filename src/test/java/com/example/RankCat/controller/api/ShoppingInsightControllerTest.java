@@ -53,7 +53,7 @@ class ShoppingInsightControllerTest {
         String jsonRequest = "{\"query\": \"노트북\"}";
 
         // 서비스가 외부 API 연동 에러를 던지도록 가짜(Mock) 설정
-        given(insightService.getShopSearchTrend(anyString()))
+        given(insightService.getShopSearchTrendSnapshot(anyString()))
                 .willThrow(new BusinessException(ErrorCode.EXTERNAL_API_ERROR));
 
         mockMvc.perform(
