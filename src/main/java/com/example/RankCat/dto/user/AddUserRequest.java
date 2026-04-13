@@ -16,10 +16,10 @@ public class AddUserRequest {
     String email;
 
     @Schema(description = "사용자 닉네임", example = "랭캣개발자")
-    @NotBlank(message = "비밀번호는 필수 입력값입니다.")
+    @NotBlank(message = "닉네임은 필수 입력값입니다.")
     String nickname;
 
     @Schema(description = "비밀번호 (8자 이상 권장)", example = "password123!")
-    @NotBlank(message = "닉네임은 필수 입력값입니다.")
+    @NotBlank(message = "비밀번호는 필수 입력값입니다.")
     String password;
 }
