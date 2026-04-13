@@ -44,7 +44,7 @@ class KeywordToolControllerTest {
     @Test
     @DisplayName("파라미터 누락: 추천 키워드 조회 시 hint를 안 보내면 C001 에러가 발생한다")
     void recommend_missingHint_throwsC001() throws Exception {
-        mockMvc.perform(get("/naver/api/keyword/recommend"))
+        mockMvc.perform(get("/api/admin/naver/keyword/recommend"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("C001"))
                 .andExpect(jsonPath("$.message").value("잘못된 입력값입니다."));
@@ -62,7 +62,7 @@ class KeywordToolControllerTest {
         given(keywordToolService.recommend(anyString(), anyInt())).willReturn(response);
 
         mockMvc.perform(
-                        get("/naver/api/keyword/recommend")
+                        get("/api/admin/naver/keyword/recommend")
                                 .param("hint", "다이어트")
                                 .param("limit", "3"))
                 .andExpect(status().isOk())
@@ -75,7 +75,7 @@ class KeywordToolControllerTest {
     @Test
     @DisplayName("파라미터 누락: 키워드 분석 조회 시 query를 안 보내면 C001 에러가 발생한다")
     void getKeywordAnalysis_missingQuery_throwsC001() throws Exception {
-        mockMvc.perform(get("/naver/api/keyword/analysis"))
+        mockMvc.perform(get("/api/admin/naver/keyword/analysis"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("C001"))
                 .andExpect(jsonPath("$.message").value("잘못된 입력값입니다."));
@@ -87,7 +87,7 @@ class KeywordToolControllerTest {
         given(keywordToolService.getKeywordAnalysis(anyString()))
                 .willThrow(new BusinessException(ErrorCode.DATA_NOT_FOUND));
 
-        mockMvc.perform(get("/naver/api/keyword/analysis").param("query", "없는키워드"))
+        mockMvc.perform(get("/api/admin/naver/keyword/analysis").param("query", "없는키워드"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("C003"))
                 .andExpect(jsonPath("$.message").value("요청하신 데이터를 찾을 수 없습니다."));

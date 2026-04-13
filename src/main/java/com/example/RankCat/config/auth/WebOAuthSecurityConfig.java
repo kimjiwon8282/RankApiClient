@@ -123,18 +123,13 @@ public class WebOAuthSecurityConfig {
                                                 "/home",
                                                 "/api/user/**",
                                                 "/api/login",
-                                                "/naver/api/**",
                                                 "/api/categories/suggest",
                                                 "/api/token")
                                         .permitAll()
-
-                                        // --- 고도화: .authenticated() 대신 hasAnyRole 적용 ---
-                                        // 스프링 시큐리티가 내부적으로 ROLE_ 접두사를 붙여 검사하므로 "USER", "ADMIN"만
-                                        // 작성합니다.
+                                        .requestMatchers("/api/admin/**")
+                                        .hasRole("ADMIN")
                                         .requestMatchers("/api/**", "/ai/**")
-                                        .hasAnyRole("USER", "ADMIN") // "USER" 권한을 추가합니다!
-
-                                        // – 뷰 템플릿(게시글 목록·상세·작성)은 공개
+                                        .hasAnyRole("USER", "ADMIN")
                                         .anyRequest()
                                         .permitAll())
 

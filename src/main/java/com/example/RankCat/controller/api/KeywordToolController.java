@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "5. 키워드 도구", description = "스케줄러가 저장한 검색광고 키워드 데이터 조회")
 @RestController
-@RequestMapping("/naver/api/keyword")
+@RequestMapping("/api/admin/naver/keyword")
 @RequiredArgsConstructor
 public class KeywordToolController {
     private final KeywordToolService keywordToolService;

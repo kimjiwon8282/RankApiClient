@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "7. 관리자 수집 상태 조회", description = "관리자가 최근 수집 실행 이력과 상태를 조회하는 읽기 전용 API")
 @RestController
-@RequestMapping("/admin/api/collectors")
+@RequestMapping("/api/admin/collectors")
 @RequiredArgsConstructor
 @Validated
 public class AdminCollectorController {

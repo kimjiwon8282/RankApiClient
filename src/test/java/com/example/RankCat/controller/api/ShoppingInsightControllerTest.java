@@ -41,7 +41,7 @@ class ShoppingInsightControllerTest {
     @Test
     @DisplayName("단일 파라미터 공백: 카테고리 트렌드 조회 시 빈칸을 보내면 C001 에러가 발생한다")
     void getCategoryTrend_blankQuery_throwsC001() throws Exception {
-        mockMvc.perform(get("/naver/api/category-trend").param("query", "   "))
+        mockMvc.perform(get("/api/admin/naver/category-trend").param("query", "   "))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("C001"))
                 .andExpect(jsonPath("$.message").value("잘못된 입력값입니다."));
@@ -53,7 +53,7 @@ class ShoppingInsightControllerTest {
         given(insightService.getShopSearchTrendSnapshot(anyString()))
                 .willThrow(new BusinessException(ErrorCode.EXTERNAL_API_ERROR));
 
-        mockMvc.perform(get("/naver/api/shop-trend").param("query", "노트북"))
+        mockMvc.perform(get("/api/admin/naver/shop-trend").param("query", "노트북"))
                 .andExpect(status().isBadGateway())
                 .andExpect(jsonPath("$.code").value("E001"))
                 .andExpect(jsonPath("$.message").value("외부 API 연동 중 문제가 발생했습니다."));

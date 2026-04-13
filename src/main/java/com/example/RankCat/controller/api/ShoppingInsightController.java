@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "4. 쇼핑 인사이트", description = "스케줄러가 저장한 쇼핑 인사이트/쇼핑 검색 결과 조회")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/naver/api")
+@RequestMapping("/api/admin/naver")
 @Validated
 public class ShoppingInsightController {
     private final ShoppingInsightService insightService;
