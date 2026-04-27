@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 히스토리</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/typography.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/my-history.css">
+</head>
+<body>
+<script src="/js/token.js"></script>
+
+<header class="site-header">
+    <div class="nav-container">
+        <div class="nav-left">
+            <a class="logo" href="/home.html">RankCat</a>
+        </div>
+
+        <div class="nav-right">
+            <span id="navGreeting" class="greeting"></span>
+            <div id="navAuthArea" class="auth-area"></div>
+        </div>
+    </div>
+
+    <script type="module" src="/js/navbar.js"></script>
+</header>
+
+<div class="history-header">
+    <h2>내 히스토리</h2>
+</div>
+
+<section class="history-table">
+    <div class="table-card">
+        <div class="table-toolbar">
+            <p id="status">히스토리 불러오는 중...</p>
+        </div>
+
+        <div class="table-scroll">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="col-query">쿼리</th>
+                    <th class="col-title">상품명</th>
+                    <th class="col-rank">예측 랭킹</th>
+                    <th class="col-date">저장일</th>
+                </tr>
+                </thead>
+
+                <tbody id="historyList"></tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<div class="back-home">
+    <a href="/home.html">
+        <button class="btn" type="button">홈으로 돌아가기</button>
+    </a>
+</div>
+
+<script type="module" src="/js/api.js"></script>
+<script type="module" src="/js/my-history.js"></script>
+</body>
+</html>

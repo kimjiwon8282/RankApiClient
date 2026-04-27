@@ -1,0 +1,117 @@
+:root{
+    --card:#fff;
+    --line:#e8edf3;
+    --text:#1f3349;
+    --muted:#6b7280;
+    --accent:#2563eb;
+    --good:#10b981;
+    --radius:14px;
+    --shadow:0 6px 20px rgba(0,0,0,.06);
+}
+
+.history-header{
+    text-align:center;
+    margin:42px 0 10px;
+}
+
+.history-header h2{
+    margin:24px;
+}
+
+/* 테이블 카드 */
+.history-table {
+    max-width: 1040px;
+    margin: 0 auto 32px;
+    padding: 0 16px;
+}
+
+.table-card {
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+}
+
+.table-toolbar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 16px;
+}
+
+#status{
+    text-align:center;
+    margin:4px;
+    font-size:18px;
+    font-weight: bold;
+}
+
+.table-scroll {
+    max-height:520px;
+    overflow:auto;
+    border-top:1px solid #eef2f6;
+}
+
+table.table {
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+}
+.table thead th{
+    position:sticky;
+    top:0;
+    z-index:1;
+    background:#f8fafc;
+    color:#374151;
+    font-weight:700;
+    text-align:left;
+    font-size:16px;
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+}
+.table tbody td{
+    padding:10px 12px;
+    font-size:16px;
+    border-bottom:1px solid #f1f5f9;
+    color:var(--text);
+    vertical-align:middle;
+}
+/* 열 너비/말줄임 */
+.col-query{ width:20%; }
+.col-title{ width:40%; }
+.col-rank{ width:15%; white-space:nowrap; }
+.col-date{ width:20%; white-space:nowrap; }
+.table td, .table th { max-width:1px; }
+.ellipsis{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* 행 효과 / 랭크 배지 */
+.table tbody tr:hover{ background:#f9fbff; }
+.rank-badge{
+    display:inline-block;
+    min-width:42px;
+    text-align:center;
+    padding:4px 8px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:14px;
+    background:#eef2ff;
+    color:var(--accent);
+}
+.rank-badge.top10{
+    background:#ecfdf5;
+    color:var(--good);
+}
+
+.back-home{
+    text-align:center;
+    margin: 10px 0 40px;
+}
+.back-home .btn{
+    padding:10px 16px;
+    border-radius:10px;
+    background:#2f66d0;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+    font-size:16px;
+}

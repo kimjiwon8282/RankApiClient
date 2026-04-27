@@ -113,25 +113,67 @@ public class WebOAuthSecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
-                                        // – 로그인·회원가입·OAuth 진입점 (공개)
+                                        // 1. 정적 화면/페이지 라우트
+                                        // 프론트 분리 전에는 Spring이 HTML을 내려주기 때문에 permitAll 유지
                                         .requestMatchers(
+                                                "/",
                                                 "/login",
-                                                "/oauth2/authorization/**",
-                                                "/login/oauth2/**",
                                                 "/signup",
-                                                "/user",
                                                 "/home",
-                                                "/api/user/**",
+                                                "/keyword-analysis",
+                                                "/optimize-product-name",
+                                                "/my-history")
+                                        .permitAll()
+
+                                        // 2. 정적 리소스 및 브라우저 자동 요청
+                                        .requestMatchers(
+                                                "/favicon.ico",
+                                                "/.well-known/**",
+                                                "/static/**",
+                                                "/css/**",
+                                                "/js/**",
+                                                "/image/**",
+                                                "/data/**")
+                                        .permitAll()
+
+                                        // 3. Swagger / OpenAPI 문서
+                                        .requestMatchers(
+                                                "/swagger-ui/**",
+                                                "/swagger-ui.html",
+                                                "/v3/api-docs/**",
+                                                "/v3/api-docs.yaml",
+                                                "/swagger-resources/**",
+                                                "/webjars/**")
+                                        .permitAll()
+
+                                        // 4. OAuth2 진입점/콜백
+                                        .requestMatchers(
+                                                "/oauth2/authorization/**", "/login/oauth2/**")
+                                        .permitAll()
+
+                                        // 5. 회원가입/로그인/이메일 인증/토큰 재발급
+                                        .requestMatchers(
                                                 "/api/login",
-                                                "/api/categories/suggest",
+                                                "/signup",
+                                                "/api/user/**",
                                                 "/api/token")
                                         .permitAll()
+
+                                        // 6. 관리자 API
                                         .requestMatchers("/api/admin/**")
                                         .hasRole("ADMIN")
-                                        .requestMatchers("/api/**", "/ai/**")
+
+                                        // 7. 로그인 사용자 API
+                                        .requestMatchers(
+                                                "/api/me",
+                                                "/api/categories/suggest",
+                                                "/api/**",
+                                                "/ai/**")
                                         .hasAnyRole("USER", "ADMIN")
+
+                                        // 8. 위에서 명시하지 않은 요청은 막기
                                         .anyRequest()
-                                        .permitAll())
+                                        .denyAll())
 
                 // 6) OAuth2 로그인(소셜 로그인) 설정
                 .oauth2Login(

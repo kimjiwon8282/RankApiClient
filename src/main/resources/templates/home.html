@@ -3,29 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>홈페이지</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/typography.css}">
-    <link rel="stylesheet" th:href="@{/css/fragments/navbar.css}">
-    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/typography.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
+<script src="/js/token.js"></script>
+
 <div th:replace="~{fragments/navbar :: navbar}"></div>
+
 <section class="home-actions">
     <a class="action-card" href="/optimize-product-name">
         <h3>상품명 최적화</h3>
         <span class="action-icon action-icon-product" aria-hidden="true"></span>
     </a>
+
     <a class="action-card" href="/keyword-analysis">
         <h3>키워드 분석</h3>
         <span class="action-icon action-icon-keyword" aria-hidden="true"></span>
     </a>
 </section>
 
-<!-- JS 파일 -->
-<script th:src="@{/js/token.js}"></script>
-<script type="module" th:src="@{/js/api.js}"></script>
-<script type="module" th:src="@{/js/home.js}"></script>
-<script type="module" th:src="@{/js/ai.js}"></script>
-
+<script type="module" src="/js/api.js"></script>
+<script type="module" src="/js/home.js"></script>
+<script type="module" src="/js/ai.js"></script>
 </body>
 </html>

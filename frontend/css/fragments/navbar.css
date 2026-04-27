@@ -1,0 +1,90 @@
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== 내부 컨테이너 ===== */
+.nav-container {
+    width: 100%;
+    min-width: 520px;
+    max-width: 1400px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+/* ===== 좌우 영역 ===== */
+.nav-left,
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+.nav-left {
+    gap: 12px;
+}
+
+.nav-right {
+    gap: 12px;
+}
+
+.logo {
+    font-weight: 800;
+    text-decoration: none;
+    color: #222;
+    font-size: 24px;
+    transition: color .2s ease;
+}
+.brand:hover { color: #467fea; }
+
+.greeting {
+    color: #444;
+    font-size: 14px;
+}
+
+.auth-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 버튼 공통 */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+    border: 1px solid transparent;
+    transition: background-color .2s, color .2s, opacity .2s;
+}
+
+/* 버튼 스타일 */
+.btn-primary {
+    background-color: #467fea;
+    color: #fff;
+    border-color: #467fea;
+}
+.btn-primary:hover { background-color: #2f66d0; }
+
+.btn-outline {
+    background-color: #fff;
+    color: #467fea;
+    border-color: #467fea;
+}
+.btn-outline:hover { background-color: #f4f8ff; }
+
+.logout-form { display: inline; margin: 0; }

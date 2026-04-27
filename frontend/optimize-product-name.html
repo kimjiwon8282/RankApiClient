@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>상품명 최적화</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/typography.css">
+    <link rel="stylesheet" href="/css/fragments/navbar.css">
+    <link rel="stylesheet" href="/css/optimize.css">
+</head>
+<body>
+<script src="/js/token.js"></script>
+
+<header class="site-header">
+    <div class="nav-container">
+        <div class="nav-left">
+            <a class="logo" href="/home.html">RankCat</a>
+        </div>
+
+        <div class="nav-right">
+            <span id="navGreeting" class="greeting"></span>
+            <div id="navAuthArea" class="auth-area"></div>
+        </div>
+    </div>
+
+    <script type="module" src="/js/navbar.js"></script>
+</header>
+
+<div class="optimize-new">
+    <div class="optimize-body">
+        <div class="container">
+            <div class="page-title">
+                <h2>상품명 최적화</h2>
+            </div>
+
+            <div class="ai-section">
+                <!-- 왼쪽 -->
+                <div class="ai-input ai-left">
+                    <!-- 카드 1: 검색 키워드 입력 -->
+                    <section class="card card-query">
+                        <h3>검색 키워드</h3>
+
+                        <form id="aiKeywordForm">
+                            <div>
+                                <label>검색키워드</label>
+                                <input id="query" type="text" value="가지">
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- 카드 2: 상품 정보 입력 -->
+                    <section class="card card-product">
+                        <h3>상품 정보 입력</h3>
+
+                        <form id="aiForm">
+                            <div>
+                                <label>상품명</label>
+                                <input id="title" type="text" value="가지 국내산 2kg 5kg 10kg">
+                            </div>
+
+                            <div>
+                                <label>최저가격</label>
+                                <input id="lprice" type="number" value="3000">
+                            </div>
+
+                            <div>
+                                <label>최고가격</label>
+                                <input id="hprice" type="number" value="0">
+                            </div>
+
+                            <div>
+                                <label>쇼핑몰이름</label>
+                                <input id="mallName" type="text" value="-클릭마켓-">
+                            </div>
+
+                            <div>
+                                <label>브랜드명</label>
+                                <input id="brand" type="text" value="">
+                            </div>
+
+                            <div>
+                                <label>판매자</label>
+                                <input id="maker" type="text" value="">
+                            </div>
+
+                            <div class="category-row">
+                                <label>카테고리</label>
+                                <div class="category-group">
+                                    <select id="category1"></select>
+                                    <span>&gt;</span>
+                                    <select id="category2"></select>
+                                    <span>&gt;</span>
+                                    <select id="category3"></select>
+                                    <span>&gt;</span>
+                                    <select id="category4"></select>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="predict-action">
+                            <button id="btnPredict" type="button">예측하기</button>
+                            <span id="aiStatus"></span>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 오른쪽 -->
+                <div class="ai-right">
+                    <section class="card card-result">
+                        <h3>AI 예측 결과</h3>
+
+                        <div class="ai-output" id="aiResultBox">
+                            <div class="rank-box">
+                                <p>예측 랭크는...</p>
+                                <p class="rank-value" id="predRankClipped">00.00</p>
+
+                                <div style="display:none;">pred_rank: <span id="predRank"></span></div>
+                                <div style="display:none;">query: <span id="respQuery"></span></div>
+                                <div style="display:none;">title: <span id="respTitle"></span></div>
+                                <div style="display:none;">exp_id: <span id="expId"></span></div>
+                            </div>
+                        </div>
+
+                        <div class="history">
+                            <div class="show-history">
+                                <a href="/my-history.html">
+                                    <button type="button">내 히스토리 보기</button>
+                                </a>
+                            </div>
+
+                            <div class="save-history">
+                                <button id="btnSave" type="button">히스토리 저장하기</button>
+                                <span id="saveStatus"></span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="module" src="/js/api.js"></script>
+<script type="module" src="/js/category.js"></script>
+<script type="module" src="/js/ai.js"></script>
+</body>
+</html>

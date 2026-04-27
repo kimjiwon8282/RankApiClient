@@ -56,12 +56,15 @@ spring:
     default-encoding: UTF-8
 
   profiles:
-    active: local # 기본값을 local로 설정하여 개발 편의성 증대
-    include: secret # 만약 비밀 키값을 별도 파일로 뺀다면 사용
+    active: ${SPRING_PROFILES_ACTIVE:local}
 
 jwt:
   issuer: ${JWT_ISSUER}
   secret-key: ${JWT_SECRET_KEY}
+
+app:
+  frontend:
+    oauth-success-url: ${APP_FRONTEND_OAUTH_SUCCESS_URL:/home}
 
 logging:
   level:
@@ -71,5 +74,5 @@ FASTAPI_URL: ${FASTAPI_URL}
 
 springdoc:
   swagger-ui:
-    tags-sorter: alpha # 태그(그룹)를 이름(알파벳/숫자) 순으로 정렬
-    operations-sorter: alpha # 태그 안의 API 엔드포인트들도 알파벳/http메서드 순으로 정렬
+    tags-sorter: alpha
+    operations-sorter: alpha

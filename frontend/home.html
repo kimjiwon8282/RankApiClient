@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>홈페이지</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/typography.css">
+  <link rel="stylesheet" href="/css/fragments/navbar.css">
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+<script src="/js/token.js"></script>
+
+<header class="site-header">
+  <div class="nav-container">
+    <div class="nav-left">
+      <a class="logo" href="/home.html">RankCat</a>
+    </div>
+
+    <div class="nav-right">
+      <span id="navGreeting" class="greeting"></span>
+      <div id="navAuthArea" class="auth-area"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/navbar.js"></script>
+</header>
+
+<section class="home-actions">
+  <a class="action-card" href="/optimize-product-name.html">
+    <h3>상품명 최적화</h3>
+    <span class="action-icon action-icon-product" aria-hidden="true"></span>
+  </a>
+</section>
+
+<script type="module" src="/js/api.js"></script>
+<script type="module" src="/js/ai.js"></script>
+</body>
+</html>

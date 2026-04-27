@@ -2,38 +2,23 @@
 
 const ACCESS_TOKEN_KEY = 'access_token';
 
-/**
- * localStorage에서 Access Token 조회
- */
 function getAccessToken() {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
-/**
- * Access Token 저장
- */
 function setAccessToken(token) {
     localStorage.setItem(ACCESS_TOKEN_KEY, token);
 }
 
-/**
- * Access Token 제거
- */
 function clearAccessToken() {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
 }
 
-/**
- * 로그인 페이지로 이동
- */
 function redirectToLogin() {
     clearAccessToken();
-    window.location.href = '/login';
+    window.location.href = '/login.html';
 }
 
-/**
- * 실제 fetch 요청 옵션 생성
- */
 function createRequestOptions(method, data, accessToken) {
     const headers = {
         Accept: 'application/json'
@@ -60,9 +45,6 @@ function createRequestOptions(method, data, accessToken) {
     return options;
 }
 
-/**
- * Access Token 재발급
- */
 async function refreshAccessToken() {
     const response = await fetch('/api/token', {
         method: 'POST',
@@ -80,13 +62,6 @@ async function refreshAccessToken() {
     return data.accessToken;
 }
 
-/**
- * 공통 API 요청 함수
- *
- * options.redirectOnUnauthorized
- * - true: 401 + 재발급 실패 시 /login 이동
- * - false: 401이어도 /login 이동하지 않음
- */
 export async function httpRequest(method, url, data = null, options = {}) {
     const { redirectOnUnauthorized = true } = options;
 

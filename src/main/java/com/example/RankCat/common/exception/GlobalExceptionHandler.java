@@ -10,6 +10,7 @@ import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -47,6 +48,11 @@ public class GlobalExceptionHandler {
         log.warn("Missing Request Cookie: {}", e.getMessage());
         ErrorResponse response = ErrorResponse.of(ErrorCode.MISSING_AUTH_COOKIE);
         return new ResponseEntity<>(response, ErrorCode.MISSING_AUTH_COOKIE.getStatus());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    protected ResponseEntity<Void> handleNoResourceFoundException(NoResourceFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(Exception.class)

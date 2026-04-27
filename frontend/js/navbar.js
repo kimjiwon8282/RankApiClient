@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (isAuthenticated) {
         authArea.innerHTML = `
-            <a class="btn btn-outline" href="/my-history">히스토리</a>
+            <a class="btn btn-outline" href="/my-history.html">히스토리</a>
             <button id="navbarLogoutButton" type="button" class="btn btn-primary">
                 로그아웃
             </button>
@@ -53,13 +53,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.error('로그아웃 요청 중 오류 발생:', error);
                 } finally {
                     localStorage.removeItem('access_token');
-                    window.location.href = '/login';
+                    window.location.href = '/login.html';
                 }
             });
         }
     } else {
         authArea.innerHTML = `
-            <a class="btn btn-primary" href="/login">로그인/가입</a>
+            <a class="btn btn-primary" href="/login.html">로그인/가입</a>
         `;
     }
 });
