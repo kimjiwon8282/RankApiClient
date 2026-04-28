@@ -1,4 +1,22 @@
+import { resolve } from 'path';
+
 export default {
+    build: {
+        outDir: 'dist',
+        emptyOutDir: true,
+        rollupOptions: {
+            input: {
+                index: resolve(__dirname, 'index.html'),
+                login: resolve(__dirname, 'login.html'),
+                signup: resolve(__dirname, 'signup.html'),
+                home: resolve(__dirname, 'home.html'),
+                optimizeProductName: resolve(__dirname, 'optimize-product-name.html'),
+                myHistory: resolve(__dirname, 'my-history.html'),
+                adminKeywordAnalysis: resolve(__dirname, 'admin/keyword-analysis.html')
+            }
+        }
+    },
+
     server: {
         proxy: {
             '/api': {
