@@ -136,7 +136,11 @@ public class WebOAuthSecurityConfig {
                                                 "/data/**")
                                         .permitAll()
 
-                                        // 3. Swagger / OpenAPI 문서
+                                        // 3. Health check
+                                        .requestMatchers("/actuator/health", "/actuator/health/**")
+                                        .permitAll()
+
+                                        // 4. Swagger / OpenAPI 문서
                                         .requestMatchers(
                                                 "/swagger-ui/**",
                                                 "/swagger-ui.html",
@@ -146,12 +150,12 @@ public class WebOAuthSecurityConfig {
                                                 "/webjars/**")
                                         .permitAll()
 
-                                        // 4. OAuth2 진입점/콜백
+                                        // 5. OAuth2 진입점/콜백
                                         .requestMatchers(
                                                 "/oauth2/authorization/**", "/login/oauth2/**")
                                         .permitAll()
 
-                                        // 5. 회원가입/로그인/이메일 인증/토큰 재발급
+                                        // 6. 회원가입/로그인/이메일 인증/토큰 재발급
                                         .requestMatchers(
                                                 "/api/login",
                                                 "/signup",
@@ -159,11 +163,11 @@ public class WebOAuthSecurityConfig {
                                                 "/api/token")
                                         .permitAll()
 
-                                        // 6. 관리자 API
+                                        // 7. 관리자 API
                                         .requestMatchers("/api/admin/**")
                                         .hasRole("ADMIN")
 
-                                        // 7. 로그인 사용자 API
+                                        // 8. 로그인 사용자 API
                                         .requestMatchers(
                                                 "/api/me",
                                                 "/api/categories/suggest",
@@ -171,7 +175,7 @@ public class WebOAuthSecurityConfig {
                                                 "/ai/**")
                                         .hasAnyRole("USER", "ADMIN")
 
-                                        // 8. 위에서 명시하지 않은 요청은 막기
+                                        // 9. 위에서 명시하지 않은 요청은 막기
                                         .anyRequest()
                                         .denyAll())
 

@@ -1,0 +1,17 @@
+.git
+.gradle
+build/
+out/
+.idea/
+*.iml
+
+.env
+.env.*
+*.log
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+node_modules/
+dist/

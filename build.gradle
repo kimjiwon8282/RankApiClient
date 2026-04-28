@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-validation' // 입력값 검증
+	implementation 'org.springframework.boot:spring-boot-starter-actuator' //컨테이너가 살아 있는지 확인할 health check endpoint
 
 	// --- [API Documentation - Swagger/OpenAPI] ---
 	// http://localhost:8080/swagger-ui/index.html 접속으로 확인 가능
