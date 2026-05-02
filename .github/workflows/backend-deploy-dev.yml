@@ -1,0 +1,116 @@
+name: Backend Deploy Dev - ECS
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - develop
+    paths:
+      - 'src/**'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - 'src/main/resources/**'
+      - '.github/workflows/backend-deploy-dev.yml'
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: rankcat-api
+  ECS_CLUSTER: rankcat-cluster
+  ECS_SERVICE: rankcat-api-service
+  ECS_TASK_DEFINITION_FAMILY: rankcat-api-task
+  CONTAINER_NAME: rankcat-api
+
+jobs:
+  deploy:
+    name: Build image and deploy to ECS
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image tag
+        id: image
+        run: |
+          IMAGE_TAG=${GITHUB_SHA::7}
+          ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+          IMAGE_URI=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
+          echo "ecr_registry=$ECR_REGISTRY" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ steps.image.outputs.image_uri }} \
+            -t ${{ steps.image.outputs.ecr_registry }}/${{ env.ECR_REPOSITORY }}:latest \
+            .
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ steps.image.outputs.image_uri }}
+          docker push ${{ steps.image.outputs.ecr_registry }}/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: Download current ECS task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.ECS_TASK_DEFINITION_FAMILY }} \
+            --query taskDefinition \
+            > task-definition-full.json
+
+      - name: Update task definition image
+        run: |
+          jq \
+            --arg IMAGE_URI "${{ steps.image.outputs.image_uri }}" \
+            --arg CONTAINER_NAME "${{ env.CONTAINER_NAME }}" \
+            '
+            .containerDefinitions |= map(
+              if .name == $CONTAINER_NAME
+              then .image = $IMAGE_URI
+              else .
+              end
+            )
+            | del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy,
+              .deregisteredAt
+            )
+            ' task-definition-full.json > task-definition.json
+
+      - name: Deploy new task definition to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: task-definition.json
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Print deployed image
+        run: |
+          echo "Deployed image: ${{ steps.image.outputs.image_uri }}"
