@@ -1,0 +1,64 @@
+name: Frontend Deploy Dev - S3 CloudFront
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - develop
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-deploy-dev.yml'
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET: rankcat-frontend-307242479390-307242479390-ap-northeast-2-an
+  CLOUDFRONT_DISTRIBUTION_ID: E4U1K21C8TZSI
+
+jobs:
+  deploy:
+    name: Build frontend and deploy to S3
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync dist to S3
+        run: |
+          aws s3 sync frontend/dist s3://${{ env.S3_BUCKET }} \
+            --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Print deployment result
+        run: |
+          echo "Frontend deployed to S3 bucket: ${{ env.S3_BUCKET }}"
+          echo "CloudFront distribution invalidated: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}"
