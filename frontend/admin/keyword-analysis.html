@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>관리자 - 키워드 분석</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 수집/키워드 대시보드</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/typography.css">
     <link rel="stylesheet" href="/css/fragments/navbar.css">
@@ -16,71 +17,188 @@
         <div class="nav-left">
             <a class="logo" href="/home.html">RankCat</a>
         </div>
-
         <div class="nav-right">
             <span id="navGreeting" class="greeting"></span>
             <div id="navAuthArea" class="auth-area"></div>
         </div>
     </div>
-
     <script type="module" src="/js/navbar.js"></script>
 </header>
 
-<div class="analysis-page">
-    <div class="analysis-inner">
-        <div class="analysis-header">
-            <h2>관리자 키워드 분석</h2>
-            <p>저장된 검색광고 키워드 데이터를 조회합니다.</p>
+<main class="admin-page">
+    <section class="admin-hero">
+        <div>
+            <p class="eyebrow">Admin Console</p>
+            <h1>수집 상태 및 키워드 데이터 조회</h1>
+            <p class="hero-desc">스케줄러가 저장한 수집 실행 이력, 네이버 키워드 데이터, 쇼핑 인사이트 스냅샷을 확인합니다.</p>
         </div>
+        <div class="hero-actions">
+            <button id="refreshOverviewButton" type="button" class="btn-primary-admin">상태 새로고침</button>
+            <a class="btn-secondary-admin" href="/swagger-ui/index.html" target="_blank" rel="noopener">Swagger</a>
+        </div>
+    </section>
 
-        <section class="analysis-input">
-            <div class="analysis-input-row">
-                <label for="query" class="analysis-input-label">분석 키워드</label>
-                <input id="query" type="text" class="analysis-input-field" placeholder="예: 가지">
-            </div>
-        </section>
+    <section id="adminGuard" class="admin-alert hidden"></section>
 
-        <section class="analysis-result">
-            <div class="analysis-table-card">
-                <div class="analysis-table-toolbar">
-                    <h3 class="analysis-result-title">
-                        연관 키워드
-                        <span id="analysisStatus" class="analysis-status"></span>
-                    </h3>
-                </div>
-
-                <div class="analysis-table-scroll">
-                    <table id="analysisTable" class="analysis-table">
-                        <thead>
-                        <tr>
-                            <th class="col-keyword">키워드</th>
-                            <th class="col-month">월 검색량</th>
-                            <th class="col-pc">PC</th>
-                            <th class="col-mobile">모바일</th>
-                            <th class="col-click">평균 클릭수(PC/M)</th>
-                            <th class="col-ctr">평균 CTR(PC/M)</th>
-                            <th class="col-depth">페이지 깊이</th>
-                            <th class="col-compet">경쟁도</th>
-                        </tr>
-                        </thead>
-
-                        <tbody id="analysisTbody">
-                        <tr class="analysis-placeholder-row">
-                            <td colspan="8" class="analysis-placeholder-cell">
-                                검색어를 입력해 주세요.
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+    <section class="dashboard-grid">
+        <article class="admin-card span-2">
+            <div class="card-header">
+                <div>
+                    <h2>수집 상태 개요</h2>
+                    <p id="overviewCheckedAt" class="card-caption">-</p>
                 </div>
             </div>
+            <div id="collectorStatusGrid" class="status-grid">
+                <div class="empty-state">상태 정보를 불러오는 중입니다.</div>
+            </div>
+        </article>
 
-            <pre id="analysisResult" style="display:none;"></pre>
-        </section>
-    </div>
-</div>
+        <article class="admin-card">
+            <div class="card-header">
+                <div>
+                    <h2>최근 실행 이력</h2>
+                    <p class="card-caption">최신 수집 잡 실행 내역</p>
+                </div>
+                <div class="inline-control compact">
+                    <input id="jobsLimit" type="number" min="1" max="100" value="20" aria-label="조회 개수">
+                    <button id="loadJobsButton" type="button">조회</button>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>잡 이름</th>
+                        <th>상태</th>
+                        <th>방식</th>
+                        <th>시작</th>
+                        <th>소요</th>
+                        <th>성공/실패</th>
+                    </tr>
+                    </thead>
+                    <tbody id="jobsTbody">
+                    <tr><td colspan="6" class="empty-cell">실행 이력을 불러오는 중입니다.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
 
-<script type="module" src="/js/api.js"></script>
+    <section class="query-grid">
+        <article class="admin-card">
+            <div class="card-header">
+                <div>
+                    <h2>키워드 추천</h2>
+                    <p class="card-caption">/api/admin/naver/keyword/recommend</p>
+                </div>
+            </div>
+            <div class="form-row">
+                <input id="recommendHint" type="text" placeholder="힌트 단어 예: 다이어트">
+                <input id="recommendLimit" type="number" min="1" max="50" value="15" aria-label="추천 개수">
+                <button id="recommendButton" type="button">조회</button>
+            </div>
+            <div id="recommendResult" class="chip-box empty-state">조회 결과가 여기에 표시됩니다.</div>
+        </article>
+
+        <article class="admin-card">
+            <div class="card-header">
+                <div>
+                    <h2>키워드 분석</h2>
+                    <p class="card-caption">/api/admin/naver/keyword/analysis</p>
+                </div>
+            </div>
+            <div class="form-row">
+                <input id="analysisQuery" type="text" placeholder="분석 키워드 예: 쌈채소">
+                <button id="analysisButton" type="button">조회</button>
+            </div>
+            <div class="table-wrap small-table">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>키워드</th>
+                        <th>월 검색량</th>
+                        <th>PC</th>
+                        <th>모바일</th>
+                        <th>경쟁도</th>
+                    </tr>
+                    </thead>
+                    <tbody id="analysisTbody">
+                    <tr><td colspan="5" class="empty-cell">조회 결과가 여기에 표시됩니다.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="admin-card">
+            <div class="card-header">
+                <div>
+                    <h2>카테고리 트렌드</h2>
+                    <p class="card-caption">/api/admin/naver/category-trend</p>
+                </div>
+            </div>
+            <div class="form-row">
+                <input id="categoryTrendQuery" type="text" placeholder="검색어 예: 쌈채소">
+                <button id="categoryTrendButton" type="button">조회</button>
+            </div>
+            <div id="categoryTrendSummary" class="summary-box empty-state">조회 결과가 여기에 표시됩니다.</div>
+        </article>
+
+        <article class="admin-card">
+            <div class="card-header">
+                <div>
+                    <h2>쇼핑 검색 트렌드</h2>
+                    <p class="card-caption">/api/admin/naver/shop-trend</p>
+                </div>
+            </div>
+            <div class="form-row">
+                <input id="shopTrendQuery" type="text" placeholder="검색어 예: 가구바퀴">
+                <button id="shopTrendButton" type="button">조회</button>
+            </div>
+            <div class="table-wrap small-table">
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>상품명</th>
+                        <th>가격</th>
+                        <th>몰</th>
+                    </tr>
+                    </thead>
+                    <tbody id="shopTrendTbody">
+                    <tr><td colspan="4" class="empty-cell">조회 결과가 여기에 표시됩니다.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="admin-card span-2">
+            <div class="card-header">
+                <div>
+                    <h2>키워드 트렌드</h2>
+                    <p class="card-caption">/api/admin/naver/keyword-trend</p>
+                </div>
+            </div>
+            <div class="form-row wide">
+                <input id="keywordTrendCategoryCode" type="text" placeholder="카테고리 코드 예: 50003308">
+                <input id="keywordTrendKeywords" type="text" placeholder="키워드 예: 우레탄바퀴, 캐스터">
+                <button id="keywordTrendButton" type="button">조회</button>
+            </div>
+            <div id="keywordTrendSummary" class="summary-box empty-state">조회 결과가 여기에 표시됩니다.</div>
+        </article>
+    </section>
+
+    <section class="admin-card">
+        <div class="card-header">
+            <div>
+                <h2>원본 응답</h2>
+                <p class="card-caption">마지막 API 응답 또는 오류 확인용</p>
+            </div>
+            <button id="clearRawButton" type="button" class="btn-light">비우기</button>
+        </div>
+        <pre id="rawResult" class="raw-result">아직 요청이 없습니다.</pre>
+    </section>
+</main>
+
 <script type="module" src="/js/keyword-analysis.js"></script>
 </body>
 </html>
