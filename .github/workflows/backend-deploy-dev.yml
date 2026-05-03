@@ -114,3 +114,9 @@ jobs:
       - name: Print deployed image
         run: |
           echo "Deployed image: ${{ steps.image.outputs.image_uri }}"
+
+      - name: Smoke test via CloudFront
+        run: |
+          echo "Smoke testing API health endpoint..."
+          curl -f --retry 5 --retry-delay 10 --retry-all-errors \
+            https://d3qzyys3kndhkl.cloudfront.net/api/health

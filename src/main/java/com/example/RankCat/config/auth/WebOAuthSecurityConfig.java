@@ -137,7 +137,10 @@ public class WebOAuthSecurityConfig {
                                         .permitAll()
 
                                         // 3. Health check
-                                        .requestMatchers("/actuator/health", "/actuator/health/**")
+                                        .requestMatchers(
+                                                "/actuator/health",
+                                                "/actuator/health/**",
+                                                "/api/health")
                                         .permitAll()
 
                                         // 4. Swagger / OpenAPI 문서
