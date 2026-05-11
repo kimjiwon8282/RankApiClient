@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/ai")
+@RequestMapping("/api/ai")
 public class UserHistoryController {
 
     private final UserHistoryService userHistoryService;

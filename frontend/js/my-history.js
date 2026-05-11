@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     statusEl.textContent = '히스토리를 불러오는 중...';
 
     try {
-        const res = await httpRequest('GET', '/ai/histories');
+        const res = await httpRequest('GET', '/api/ai/histories');
 
         if (!res.ok) {
             window.location.href = '/login.html';

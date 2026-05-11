@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const res = await httpRequest('POST', '/ai/predict', {
+            const res = await httpRequest('POST', '/api/ai/predict', {
                 items: [lastReq],
                 clip_to_range: true
             });
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const res = await httpRequest('POST', '/ai/save', savePayload);
+            const res = await httpRequest('POST', '/api/ai/save', savePayload);
 
             if (res.ok) {
                 saveStatus.textContent = '저장 성공!';
