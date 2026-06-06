@@ -365,15 +365,10 @@ GET /api/ai/histories?size=100
 
 <br>
 
-## 8. API 명세
-
-- [OpenAPI JSON 명세](./docs/openapi.json)
-- [Postman Collection](./docs/rankit.postman_collection.json)
-- Swagger UI: 로컬 실행 후 `http://localhost:8080/swagger-ui/index.html`에서 확인 가능
 
 <br>
 
-## 9. 팀원 및 역할
+## 8. 팀원 및 역할
 
 | 이름      | 역할               | 담당 내용                                                                                                                                                     |
 | ------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
